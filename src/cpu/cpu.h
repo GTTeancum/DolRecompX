@@ -136,6 +136,22 @@ extern PPCMemWriteJournal g_mem_write_journal;
 extern void* g_mem_write_journal_user;
 void ppc_set_mem_write_journal(PPCMemWriteJournal fn, void* user);
 
+/* Optional pre-store policy for mapped scalar RAM writes. Invoked before RAM,
+   reservation or journal side effects. Value is the low size*8 bits in guest
+   big-endian order; size is 1/2/4/8. A rejecting callback must not return.
+   External-write providers must enforce their own policy after validating the
+   complete access. Process-global like the legacy journal: serialize users.
+   This adds no CPUState fields and does not change the journal ABI. */
+typedef void (*PPCMemWriteCheck)(CPUState* cpu, u32 address, u64 value,
+                                 u8 size, void* user);
+extern PPCMemWriteCheck g_mem_write_check;
+extern void* g_mem_write_check_user;
+void ppc_set_mem_write_check(PPCMemWriteCheck fn, void* user);
+/* After validating a store, invalidate a reservation on any overlapped 32-byte
+   line. Uses the same fixed MEM1/MEM2 alias model as the scalar RAM helpers. */
+void ppc_clear_reservation_for_store(CPUState* cpu, u32 address, u32 size);
+
+
 bool cpu_init(CPUState* cpu);
 bool cpu_alloc_mem2(CPUState* cpu, u32 size); //mem 2 only exists after first aloc
 void cpu_free(CPUState* cpu);

@@ -16,6 +16,14 @@ void ppc_set_mem_write_journal(PPCMemWriteJournal fn, void* user) {
     g_mem_write_journal_user = user;
 }
 
+PPCMemWriteCheck g_mem_write_check = NULL;
+void* g_mem_write_check_user = NULL;
+
+void ppc_set_mem_write_check(PPCMemWriteCheck fn, void* user) {
+    g_mem_write_check = fn;
+    g_mem_write_check_user = user;
+}
+
 #if defined(_MSC_VER)
 #include <intrin.h>
 #include <xmmintrin.h>
@@ -143,10 +151,13 @@ static u8* resolve_addr(CPUState* cpu, u32 addr, u32* avail) {
     return NULL;
 }
 
-static void clear_matching_reservation(CPUState* cpu, u32 addr) {
-    const u32 reserve_addr = cpu->reserve_addr & ~0x40000000u;
-    const u32 store_addr = addr & ~0x40000000u;
-    if (cpu->reserve_valid && ((reserve_addr ^ store_addr) & ~31u) == 0)
+void ppc_clear_reservation_for_store(CPUState* cpu, u32 addr, u32 size) {
+    /* Cached, uncached and physical aliases share a reservation. MEM2 keeps
+       its 0x10000000 bank bit. Caller has validated the entire RAM access. */
+    const u32 line = (cpu->reserve_addr & 0x1FFFFFFFu) & ~31u;
+    const u32 start = addr & 0x1FFFFFFFu;
+    if (cpu->reserve_valid && size && (u64)start < (u64)line + 32u &&
+        (u64)start + size > line)
         cpu->reserve_valid = false;
 }
 
@@ -213,8 +224,12 @@ void mem_write64(CPUState* cpu, u32 addr, u64 value) {
         fprintf(stderr, "warn: write64 to unmapped 0x%08X\n", addr);
         return;
     }
-    clear_matching_reservation(cpu, addr);
-    if (g_mem_write_journal && host >= cpu->ram && host < cpu->ram + cpu->ram_size)
+    if (g_mem_write_check)
+        g_mem_write_check(cpu, addr, value, 8, g_mem_write_check_user);
+    ppc_clear_reservation_for_store(cpu, addr, 8);
+    if (g_mem_write_journal &&
+        ((addr >= GC_RAM_BASE && addr - GC_RAM_BASE < cpu->ram_size) ||
+         (addr >= GC_RAM_UNCACHED && addr - GC_RAM_UNCACHED < cpu->ram_size)))
         g_mem_write_journal((u32)(host - cpu->ram), 8, g_mem_write_journal_user);
     write_be64(host, value);
 }
@@ -242,8 +257,12 @@ void mem_write32(CPUState* cpu, u32 addr, u32 value) {
         fprintf(stderr, "warn: write32 to unmapped 0x%08X\n", addr);
         return;
     }
-    clear_matching_reservation(cpu, addr);
-    if (g_mem_write_journal && host >= cpu->ram && host < cpu->ram + cpu->ram_size)
+    if (g_mem_write_check)
+        g_mem_write_check(cpu, addr, value, 4, g_mem_write_check_user);
+    ppc_clear_reservation_for_store(cpu, addr, 4);
+    if (g_mem_write_journal &&
+        ((addr >= GC_RAM_BASE && addr - GC_RAM_BASE < cpu->ram_size) ||
+         (addr >= GC_RAM_UNCACHED && addr - GC_RAM_UNCACHED < cpu->ram_size)))
         g_mem_write_journal((u32)(host - cpu->ram), 4, g_mem_write_journal_user);
     write_be32(host, value);
 }
@@ -271,8 +290,12 @@ void mem_write16(CPUState* cpu, u32 addr, u16 value) {
         fprintf(stderr, "warn: write16 to unmapped 0x%08X\n", addr);
         return;
     }
-    clear_matching_reservation(cpu, addr);
-    if (g_mem_write_journal && host >= cpu->ram && host < cpu->ram + cpu->ram_size)
+    if (g_mem_write_check)
+        g_mem_write_check(cpu, addr, value, 2, g_mem_write_check_user);
+    ppc_clear_reservation_for_store(cpu, addr, 2);
+    if (g_mem_write_journal &&
+        ((addr >= GC_RAM_BASE && addr - GC_RAM_BASE < cpu->ram_size) ||
+         (addr >= GC_RAM_UNCACHED && addr - GC_RAM_UNCACHED < cpu->ram_size)))
         g_mem_write_journal((u32)(host - cpu->ram), 2, g_mem_write_journal_user);
     write_be16(host, value);
 }
@@ -300,8 +323,12 @@ void mem_write8(CPUState* cpu, u32 addr, u8 value) {
         fprintf(stderr, "warn: write8 to unmapped 0x%08X\n", addr);
         return;
     }
-    clear_matching_reservation(cpu, addr);
-    if (g_mem_write_journal && host >= cpu->ram && host < cpu->ram + cpu->ram_size)
+    if (g_mem_write_check)
+        g_mem_write_check(cpu, addr, value, 1, g_mem_write_check_user);
+    ppc_clear_reservation_for_store(cpu, addr, 1);
+    if (g_mem_write_journal &&
+        ((addr >= GC_RAM_BASE && addr - GC_RAM_BASE < cpu->ram_size) ||
+         (addr >= GC_RAM_UNCACHED && addr - GC_RAM_UNCACHED < cpu->ram_size)))
         g_mem_write_journal((u32)(host - cpu->ram), 1, g_mem_write_journal_user);
     *host = value;
 }
