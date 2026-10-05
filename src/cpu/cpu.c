@@ -1255,7 +1255,12 @@ bool ppc_fma(CPUState* cpu, f64 a, f64 c, f64 b, bool single,
 void ppc_memory_fence(void) {
 #if defined(_MSC_VER)
     _ReadWriteBarrier();
-#if defined(_M_IX86) || defined(_M_X64)
+#if defined(_M_IX86)
+    /* A locked exchange is a full fence on pre-SSE2 x86 (including Xbox).
+       MFENCE is not available on the original Xbox's Pentium III CPU. */
+    volatile long barrier = 0;
+    _InterlockedExchange(&barrier, 1);
+#elif defined(_M_X64)
     _mm_mfence();
 #endif
     _ReadWriteBarrier();
