@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static bool instruction_uses_fallback(const PPCInst* inst) {
+static bool instruction_is_runtime_boundary(const PPCInst* inst) {
     switch (inst->op) {
     case PPC_OP_DCBST:
     case PPC_OP_DCBF:
@@ -72,12 +72,12 @@ static bool instruction_ends_block(const PPCInst* inst) {
     case PPC_OP_RFI:
         return true;
     default:
-        return instruction_uses_fallback(inst);
+        return instruction_is_runtime_boundary(inst);
     }
 }
 
 static u32 instruction_cycles(const PPCInst* inst) {
-    if (inst->embedded_data || instruction_uses_fallback(inst))
+    if (inst->embedded_data || inst->op == PPC_OP_UNKNOWN)
         return 0;
 
     switch (inst->op) {
@@ -101,6 +101,9 @@ static u32 instruction_cycles(const PPCInst* inst) {
     case PPC_OP_DIVWUO:
         return 40;
     case PPC_OP_DCBZ:
+    case PPC_OP_DCBST:
+    case PPC_OP_DCBF:
+    case PPC_OP_DCBI:
         return 5;
     case PPC_OP_DCBTST:
     case PPC_OP_DCBT:

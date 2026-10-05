@@ -16,6 +16,45 @@ static u64 bits_of(f64 value) {
     return bits;
 }
 
+void func_80004100(CPUState* ctx);
+void func_80004120(CPUState* ctx);
+static unsigned spr_reads,spr_writes,cache_calls;
+static u32 saved_hid0,cache_addresses[4];
+static u8 cache_ops[4];
+static u32 read_system(CPUState* c,u16 spr,u32 cia) {
+    (void)c;(void)cia;if(spr!=1008) return 0;
+    ++spr_reads;return saved_hid0;
+}
+static void write_system(CPUState* c,u16 spr,u32 value,u32 cia) {
+    (void)c;(void)cia;if(spr==1008){++spr_writes;saved_hid0=value;}
+}
+static void cache_system(CPUState* c,u8 op,u32 address,u32 cia) {
+    (void)c;(void)cia;
+    if(cache_calls<4){cache_ops[cache_calls]=op;cache_addresses[cache_calls]=address;}
+    ++cache_calls;
+}
+static int check_system_callbacks(CPUState* c) {
+    cpu_reset(c);c->spr_read=read_system;c->spr_write=write_system;c->cache_control=cache_system;
+    c->gpr[6]=0x80001005;c->gpr[7]=32;c->lr=0x81234560;
+    saved_hid0=0x0011c664;c->pc=0x80004100;func_80004100(c);
+    int ok=c->pc==c->lr&&!c->exception&&spr_reads==1&&spr_writes==1&&
+        saved_hid0==0x0011ce64&&c->gpr[5]==saved_hid0&&cache_calls==3&&
+        cache_ops[0]==PPC_CACHE_DCBF&&cache_ops[1]==PPC_CACHE_DCBST&&
+        cache_ops[2]==PPC_CACHE_ICBI&&cache_addresses[0]==0x80001005&&
+        cache_addresses[1]==0x80001025&&cache_addresses[2]==0x80001005;
+    c->pc=0x80004120;func_80004120(c);
+    ok &= c->pc==c->lr&&cache_calls==4&&cache_ops[3]==PPC_CACHE_DCBI;
+    /* Privilege failures must not write the destination or call a host hook. */
+    c->msr=0x4000;c->exception=0;c->gpr[5]=0xfeedface;c->pc=0x80004100;
+    func_80004100(c);
+    ok &= c->exception==PPC_EXC_PROGRAM&&c->gpr[5]==0xfeedface&&
+          spr_reads==1&&spr_writes==1&&cache_calls==4;
+    c->exception=0;c->msr=0x4000;c->pc=0x80004120;func_80004120(c);
+    ok &= c->exception==PPC_EXC_PROGRAM&&cache_calls==4;
+    printf("System callback sequence, address formation and privilege checks: %s\n",ok?"PASS":"FAIL");
+    return ok;
+}
+
 int main(void) {
     CPUState cpu;
     if (!cpu_init(&cpu))
@@ -92,6 +131,7 @@ int main(void) {
                 compare_ok, record_ok, merge_ok, cpu.fpscr, cpu.cr);
     }
 
+    int system_ok=check_system_callbacks(&cpu);
     cpu_free(&cpu);
-    return !(integer_ok && memory_ok && compare_ok && record_ok && merge_ok);
+    return !(system_ok && integer_ok && memory_ok && compare_ok && record_ok && merge_ok);
 }

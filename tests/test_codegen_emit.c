@@ -177,6 +177,26 @@ int main(int argc, char** argv) {
     if (!emit_function(out, paired_merge, 2, BASE + 0x1070))
         return 1;
 
+    /* Synthetic environment-callback sequence. No game-derived instructions. */
+    const u32 system_raw[] = {
+        (31u<<26)|(5u<<21)|(16u<<16)|(31u<<11)|(339u<<1), /* mfspr r5,HID0 */
+        (24u<<26)|(5u<<21)|(5u<<16)|0x0800u,             /* ori r5,r5,ICFI */
+        (31u<<26)|(5u<<21)|(16u<<16)|(31u<<11)|(467u<<1), /* mtspr HID0,r5 */
+        (31u<<26)|(6u<<11)|(86u<<1),                    /* dcbf 0,r6 */
+        (31u<<26)|(7u<<16)|(6u<<11)|(54u<<1),            /* dcbst r7,r6 */
+        (31u<<26)|(6u<<11)|(982u<<1),                   /* icbi 0,r6 */
+        0x4e800020u
+    };
+    PPCInst system_ops[7];
+    for (u32 i=0;i<7;++i)
+        system_ops[i]=ppc_decode(system_raw[i],0x80004100u+i*4);
+    if (!emit_function(out,system_ops,7,0x80004100u)) return 1;
+    PPCInst invalidate_ops[2]={
+        ppc_decode((31u<<26)|(6u<<11)|(470u<<1),0x80004120u),
+        ppc_decode(0x4e800020u,0x80004124u)
+    };
+    if (!emit_function(out,invalidate_ops,2,0x80004120u)) return 1;
+
     FunctionList funcs = {0};
     if (!function_list_add(&funcs, BASE, BASE + (u32)count * 4u) ||
         !function_list_add(&funcs, BASE + 0x1000, BASE + 0x100C) ||
@@ -193,6 +213,8 @@ int main(int argc, char** argv) {
         if (out != stdout) fclose(out);
         return 1;
     }
+    if (!function_list_add(&funcs,0x80004100u,0x8000411cu) ||
+        !function_list_add(&funcs,0x80004120u,0x80004128u)) return 1;
     emit_dispatch_helpers(out, &funcs, BASE);
     function_list_free(&funcs);
 
