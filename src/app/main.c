@@ -59,7 +59,12 @@ int main(int argc, char** argv) {
         fprintf(stderr, "error: --map currently supports DOL input only\n");
         return 1;
     }
-    if (!titleless_mode && !database_titles_available()) {
+    /* A titles database supplies display names, not the source platform.
+       Preserve explicitly supplied Wii IDs even in an offline build. Keep the
+       legacy titleless/output-directory fallback for unlabelled DOLs. */
+    int explicit_wii_title = title_id_arg &&
+        (output_arg || is_title_id_length_valid(title_id_arg));
+    if (!titleless_mode && !explicit_wii_title && !database_titles_available()) {
         print_database_missing_notice();
         effective_gamecube_mode = 1;
         titleless_mode = 1;
