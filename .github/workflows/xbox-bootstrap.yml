@@ -3,7 +3,11 @@ name: Xbox bootstrap baseline
 on:
   push:
     branches: [xbox/bootstrap]
-    paths: [.github/workflows/xbox-bootstrap.yml]
+    paths:
+      - .github/workflows/xbox-bootstrap.yml
+      - src/**
+      - tests/**
+      - CMakeLists.txt
   workflow_dispatch:
 
 permissions:
@@ -38,6 +42,11 @@ jobs:
         run: cmake --build build --parallel 2
       - name: Test baseline
         run: ctest --test-dir build --output-on-failure
+      - name: Test offline Wii platform selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tests/test_cli_offline.py build/dolrecomp 2>&1 | tee build/offline-cli.log
       - name: Collect build evidence
         if: always()
         shell: bash
@@ -45,6 +54,7 @@ jobs:
           mkdir -p evidence
           cp export/REVISION.txt export/SUBMODULES.txt evidence/
           cp build/Testing/Temporary/LastTest.log evidence/ 2>/dev/null || true
+          cp build/offline-cli.log evidence/ 2>/dev/null || true
           cp build/CMakeCache.txt evidence/ 2>/dev/null || true
           find build -maxdepth 2 -type f -iname '*dolrecomp*' -executable -exec cp {} evidence/ \;
       - uses: actions/upload-artifact@v4
