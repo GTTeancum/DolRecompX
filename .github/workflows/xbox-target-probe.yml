@@ -48,7 +48,7 @@ jobs:
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOLRECOMP_ENABLE_LLVM=OFF
           cmake --build build --parallel 2
           ctest --test-dir build --output-on-failure | tee evidence/ctest.log
-          python3 tests/test_cli_offline.py --dolrecomp "$PWD/build/dolrecomp" 2>&1 | tee evidence/offline-cli.log
+          python3 tests/test_cli_offline.py "$PWD/build/dolrecomp" 2>&1 | tee evidence/offline-cli.log
       - name: Build SDK hello XBE (toolchain check, not game boot)
         shell: bash
         run: |
