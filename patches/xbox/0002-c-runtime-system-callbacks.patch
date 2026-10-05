@@ -1,0 +1,202 @@
+--- a/src/backend/emitter.c
++++ b/src/backend/emitter.c
+@@ -1610,11 +1610,21 @@
+     case PPC_OP_DCBST:
+     case PPC_OP_DCBF:
+     case PPC_OP_DCBI:
+-    case PPC_OP_ICBI:
+-        fprintf(out, "    ppc_fallback_instruction(ctx, 0x%08Xu, 0x%08Xu);\n",
+-                inst->raw, inst->address);
+-        fprintf(out, "    return;\n");
+-        break;
++    case PPC_OP_ICBI: {
++        const char* operation = inst->op == PPC_OP_DCBST ? "PPC_CACHE_DCBST" :
++                                inst->op == PPC_OP_DCBF ? "PPC_CACHE_DCBF" :
++                                inst->op == PPC_OP_DCBI ? "PPC_CACHE_DCBI" :
++                                                         "PPC_CACHE_ICBI";
++        fprintf(out, "    {\n");
++        fprintf(out, "        u32 ea = ");
++        emit_xform_ea(out, inst->rA, inst->rB, false);
++        fprintf(out, ";\n");
++        fprintf(out, "        ppc_cache_control(ctx, %s, ea, 0x%08Xu);\n",
++                operation, inst->address);
++        fprintf(out, "        if (ctx->exception) return;\n");
++        fprintf(out, "    }\n");
++        break;
++    }
+ 
+     case PPC_OP_DCBTST:
+     case PPC_OP_DCBT:
+@@ -1801,9 +1811,12 @@
+         case 282: fprintf(out, "    ctx->gpr[%u] = ctx->ear;\n", inst->rD); break;
+         case 920: fprintf(out, "    ctx->gpr[%u] = ctx->hid2;\n", inst->rD); break;
+         default:
+-            fprintf(out, "    ppc_fallback_instruction(ctx, 0x%08Xu, 0x%08Xu);\n",
+-                    inst->raw, inst->address);
+-            fprintf(out, "    return;\n");
++            fprintf(out, "    {\n");
++            fprintf(out, "        u32 value = ppc_mfspr(ctx, %uu, 0x%08Xu);\n",
++                    inst->spr, inst->address);
++            fprintf(out, "        if (ctx->exception) return;\n");
++            fprintf(out, "        ctx->gpr[%u] = value;\n", inst->rD);
++            fprintf(out, "    }\n");
+             break;
+         }
+         break;
+@@ -1826,9 +1839,9 @@
+         case 919: fprintf(out, "    ctx->gqr[7] = ctx->gpr[%u];\n", inst->rS); break;
+         case 920: fprintf(out, "    ctx->hid2 = ctx->gpr[%u];\n", inst->rS); break;
+         default:
+-            fprintf(out, "    ppc_fallback_instruction(ctx, 0x%08Xu, 0x%08Xu);\n",
+-                    inst->raw, inst->address);
+-            fprintf(out, "    return;\n");
++            fprintf(out, "    ppc_mtspr(ctx, %uu, ctx->gpr[%u], 0x%08Xu);\n",
++                    inst->spr, inst->rS, inst->address);
++            fprintf(out, "    if (ctx->exception) return;\n");
+             break;
+         }
+         break;
+--- a/src/backend/c_cfg.c
++++ b/src/backend/c_cfg.c
+@@ -5,7 +5,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ 
+-static bool instruction_uses_fallback(const PPCInst* inst) {
++static bool instruction_is_runtime_boundary(const PPCInst* inst) {
+     switch (inst->op) {
+     case PPC_OP_DCBST:
+     case PPC_OP_DCBF:
+@@ -72,12 +72,12 @@
+     case PPC_OP_RFI:
+         return true;
+     default:
+-        return instruction_uses_fallback(inst);
++        return instruction_is_runtime_boundary(inst);
+     }
+ }
+ 
+ static u32 instruction_cycles(const PPCInst* inst) {
+-    if (inst->embedded_data || instruction_uses_fallback(inst))
++    if (inst->embedded_data || inst->op == PPC_OP_UNKNOWN)
+         return 0;
+ 
+     switch (inst->op) {
+@@ -101,6 +101,9 @@
+     case PPC_OP_DIVWUO:
+         return 40;
+     case PPC_OP_DCBZ:
++    case PPC_OP_DCBST:
++    case PPC_OP_DCBF:
++    case PPC_OP_DCBI:
+         return 5;
+     case PPC_OP_DCBTST:
+     case PPC_OP_DCBT:
+--- a/tests/cmake/codegen_compile.cmake
++++ b/tests/cmake/codegen_compile.cmake
+@@ -45,8 +45,8 @@
+ if(NOT generated_source MATCHES "if \\(!ppc_fp_available_inline\\(ctx, 0x8000317Cu\\)\\) return;")
+     message(FATAL_ERROR "generated floating-point code has no MSR FP gate")
+ endif()
+-if(NOT generated_source MATCHES "ppc_fallback_instruction\\(ctx, 0x7C13A0ACu")
+-    message(FATAL_ERROR "dcbf codegen does not route through the environment fallback")
++if(NOT generated_source MATCHES "ppc_cache_control\\(ctx, PPC_CACHE_DCBF, ea,")
++    message(FATAL_ERROR "dcbf codegen does not route through the cache-control callback")
+ endif()
+ 
+ get_filename_component(output_dir "${OUTPUT_C}" DIRECTORY)
+--- a/tests/test_codegen_emit.c
++++ b/tests/test_codegen_emit.c
+@@ -177,6 +177,26 @@
+     if (!emit_function(out, paired_merge, 2, BASE + 0x1070))
+         return 1;
+ 
++    /* Synthetic environment-callback sequence. No game-derived instructions. */
++    const u32 system_raw[] = {
++        (31u<<26)|(5u<<21)|(16u<<16)|(31u<<11)|(339u<<1), /* mfspr r5,HID0 */
++        (24u<<26)|(5u<<21)|(5u<<16)|0x0800u,             /* ori r5,r5,ICFI */
++        (31u<<26)|(5u<<21)|(16u<<16)|(31u<<11)|(467u<<1), /* mtspr HID0,r5 */
++        (31u<<26)|(6u<<11)|(86u<<1),                    /* dcbf 0,r6 */
++        (31u<<26)|(7u<<16)|(6u<<11)|(54u<<1),            /* dcbst r7,r6 */
++        (31u<<26)|(6u<<11)|(982u<<1),                   /* icbi 0,r6 */
++        0x4e800020u
++    };
++    PPCInst system_ops[7];
++    for (u32 i=0;i<7;++i)
++        system_ops[i]=ppc_decode(system_raw[i],0x80004100u+i*4);
++    if (!emit_function(out,system_ops,7,0x80004100u)) return 1;
++    PPCInst invalidate_ops[2]={
++        ppc_decode((31u<<26)|(6u<<11)|(470u<<1),0x80004120u),
++        ppc_decode(0x4e800020u,0x80004124u)
++    };
++    if (!emit_function(out,invalidate_ops,2,0x80004120u)) return 1;
++
+     FunctionList funcs = {0};
+     if (!function_list_add(&funcs, BASE, BASE + (u32)count * 4u) ||
+         !function_list_add(&funcs, BASE + 0x1000, BASE + 0x100C) ||
+@@ -193,6 +213,8 @@
+         if (out != stdout) fclose(out);
+         return 1;
+     }
++    if (!function_list_add(&funcs,0x80004100u,0x8000411cu) ||
++        !function_list_add(&funcs,0x80004120u,0x80004128u)) return 1;
+     emit_dispatch_helpers(out, &funcs, BASE);
+     function_list_free(&funcs);
+ 
+--- a/tests/test_c_execute.c
++++ b/tests/test_c_execute.c
+@@ -14,6 +14,45 @@
+     u64 bits;
+     memcpy(&bits, &value, sizeof(bits));
+     return bits;
++}
++
++void func_80004100(CPUState* ctx);
++void func_80004120(CPUState* ctx);
++static unsigned spr_reads,spr_writes,cache_calls;
++static u32 saved_hid0,cache_addresses[4];
++static u8 cache_ops[4];
++static u32 read_system(CPUState* c,u16 spr,u32 cia) {
++    (void)c;(void)cia;if(spr!=1008) return 0;
++    ++spr_reads;return saved_hid0;
++}
++static void write_system(CPUState* c,u16 spr,u32 value,u32 cia) {
++    (void)c;(void)cia;if(spr==1008){++spr_writes;saved_hid0=value;}
++}
++static void cache_system(CPUState* c,u8 op,u32 address,u32 cia) {
++    (void)c;(void)cia;
++    if(cache_calls<4){cache_ops[cache_calls]=op;cache_addresses[cache_calls]=address;}
++    ++cache_calls;
++}
++static int check_system_callbacks(CPUState* c) {
++    cpu_reset(c);c->spr_read=read_system;c->spr_write=write_system;c->cache_control=cache_system;
++    c->gpr[6]=0x80001005;c->gpr[7]=32;c->lr=0x81234560;
++    saved_hid0=0x0011c664;c->pc=0x80004100;func_80004100(c);
++    int ok=c->pc==c->lr&&!c->exception&&spr_reads==1&&spr_writes==1&&
++        saved_hid0==0x0011ce64&&c->gpr[5]==saved_hid0&&cache_calls==3&&
++        cache_ops[0]==PPC_CACHE_DCBF&&cache_ops[1]==PPC_CACHE_DCBST&&
++        cache_ops[2]==PPC_CACHE_ICBI&&cache_addresses[0]==0x80001005&&
++        cache_addresses[1]==0x80001025&&cache_addresses[2]==0x80001005;
++    c->pc=0x80004120;func_80004120(c);
++    ok &= c->pc==c->lr&&cache_calls==4&&cache_ops[3]==PPC_CACHE_DCBI;
++    /* Privilege failures must not write the destination or call a host hook. */
++    c->msr=0x4000;c->exception=0;c->gpr[5]=0xfeedface;c->pc=0x80004100;
++    func_80004100(c);
++    ok &= c->exception==PPC_EXC_PROGRAM&&c->gpr[5]==0xfeedface&&
++          spr_reads==1&&spr_writes==1&&cache_calls==4;
++    c->exception=0;c->msr=0x4000;c->pc=0x80004120;func_80004120(c);
++    ok &= c->exception==PPC_EXC_PROGRAM&&cache_calls==4;
++    printf("System callback sequence, address formation and privilege checks: %s\n",ok?"PASS":"FAIL");
++    return ok;
+ }
+ 
+ int main(void) {
+@@ -92,6 +131,7 @@
+                 compare_ok, record_ok, merge_ok, cpu.fpscr, cpu.cr);
+     }
+ 
++    int system_ok=check_system_callbacks(&cpu);
+     cpu_free(&cpu);
+-    return !(integer_ok && memory_ok && compare_ok && record_ok && merge_ok);
++    return !(system_ok && integer_ok && memory_ok && compare_ok && record_ok && merge_ok);
+ }

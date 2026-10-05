@@ -1,0 +1,71 @@
+name: Xbox C system callbacks
+on:
+  push:
+    branches: [xbox/bootstrap]
+    paths: [patches/xbox/0002-*, .github/workflows/xbox-system-callbacks.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-and-apply:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: xbox/bootstrap
+          submodules: recursive
+      - name: Apply only the hash-locked five-file compiler change
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          mkdir -p artifacts
+          python3 - <<'PY'
+          import hashlib,json,subprocess
+          from pathlib import Path
+          records=json.loads(Path('patches/xbox/0002-hashes.json').read_text())
+          allowed={'src/backend/emitter.c','src/backend/c_cfg.c','tests/cmake/codegen_compile.cmake','tests/test_codegen_emit.c','tests/test_c_execute.c'}
+          assert set(records)==allowed
+          sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+          if not all(sha(p)==v['after'] for p,v in records.items()):
+              assert all(sha(p)==v['before'] for p,v in records.items()), 'unexpected source; do not overwrite'
+              subprocess.run(['git','apply','--check','patches/xbox/0002-c-runtime-system-callbacks.patch'],check=True)
+              subprocess.run(['git','apply','patches/xbox/0002-c-runtime-system-callbacks.patch'],check=True)
+          assert all(sha(p)==v['after'] for p,v in records.items())
+          PY
+      - name: Build and test synthetic code only
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOLRECOMP_ENABLE_LLVM=OFF
+          cmake --build build --parallel 2
+          ctest --test-dir build --output-on-failure 2>&1 | tee artifacts/ctest.log
+          python3 tests/test_cli_offline.py build/dolrecomp 2>&1 | tee artifacts/offline-cli.log
+      - name: Commit only validated source paths without forcing
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add src/backend/emitter.c src/backend/c_cfg.c tests/cmake/codegen_compile.cmake tests/test_codegen_emit.c tests/test_c_execute.c
+          if ! git diff --cached --quiet; then
+            test "$(git ls-remote origin refs/heads/xbox/bootstrap | cut -f1)" = "$GITHUB_SHA"
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'fix: route C system-register and cache operations through runtime helpers'
+            git push origin HEAD:refs/heads/xbox/bootstrap
+          fi
+      - name: Export tested source and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD > artifacts/REVISION.txt
+          git submodule status --recursive > artifacts/SUBMODULES.txt
+          cp build/Testing/Temporary/LastTest.log artifacts/
+          tar --exclude-vcs --exclude='./artifacts' --exclude='./build' -czf artifacts/DolRecompX-B004-source.tar.gz .
+          sha256sum artifacts/DolRecompX-B004-source.tar.gz > artifacts/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DolRecompX-B004-validation
+          path: artifacts/
+          retention-days: 14
