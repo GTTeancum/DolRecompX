@@ -1,0 +1,73 @@
+name: Xbox Broadway runtime access
+on:
+  push:
+    branches: [xbox/bootstrap]
+    paths: [patches/xbox/0003-*, .github/workflows/xbox-broadway.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-and-apply:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: xbox/bootstrap
+          submodules: recursive
+      - name: Apply the five hash-locked source changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          mkdir -p artifacts
+          python3 - <<'PY'
+          import hashlib,json,subprocess
+          from pathlib import Path
+          records=json.loads(Path('patches/xbox/0003-hashes.json').read_text())
+          allowed={'src/cpu/cpu.c','src/cpu/cpu.h','tests/test_module_abi.c','tests/test_broadway_spr.c','CMakeLists.txt'}
+          assert set(records)==allowed
+          def sha(p):
+              f=Path(p)
+              return hashlib.sha256(f.read_bytes()).hexdigest() if f.is_file() else None
+          if not all(sha(p)==v['after'] for p,v in records.items()):
+              assert all(sha(p)==v['before'] for p,v in records.items()), 'unexpected source; refusing overwrite'
+              subprocess.run(['git','apply','--check','patches/xbox/0003-broadway-hid4.patch'],check=True)
+              subprocess.run(['git','apply','patches/xbox/0003-broadway-hid4.patch'],check=True)
+          assert all(sha(p)==v['after'] for p,v in records.items())
+          PY
+      - name: Build and test without game data
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOLRECOMP_ENABLE_LLVM=OFF
+          cmake --build build --parallel 2
+          ctest --test-dir build --output-on-failure 2>&1 | tee artifacts/ctest.log
+          python3 tests/test_cli_offline.py build/dolrecomp 2>&1 | tee artifacts/offline-cli.log
+      - name: Commit only tested paths without forcing
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add src/cpu/cpu.c src/cpu/cpu.h tests/test_module_abi.c tests/test_broadway_spr.c CMakeLists.txt
+          if ! git diff --cached --quiet; then
+            test "$(git ls-remote origin refs/heads/xbox/bootstrap | cut -f1)" = "$GITHUB_SHA"
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'fix: gate HID4 access on explicit Broadway runtime selection'
+            git push origin HEAD:refs/heads/xbox/bootstrap
+          fi
+      - name: Export tested source and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD > artifacts/REVISION.txt
+          git submodule status --recursive > artifacts/SUBMODULES.txt
+          cp build/Testing/Temporary/LastTest.log artifacts/
+          tar --exclude-vcs --exclude='./artifacts' --exclude='./build' -czf artifacts/DolRecompX-B006-source.tar.gz .
+          sha256sum artifacts/DolRecompX-B006-source.tar.gz > artifacts/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DolRecompX-B006-validation
+          path: artifacts/
+          retention-days: 14

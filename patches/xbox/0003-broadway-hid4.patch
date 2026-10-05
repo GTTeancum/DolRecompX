@@ -1,0 +1,168 @@
+--- a/src/cpu/cpu.c
++++ b/src/cpu/cpu.c
+@@ -85,6 +85,7 @@
+     PPCSPRRead spr_read = cpu->spr_read;
+     PPCSPRWrite spr_write = cpu->spr_write;
+     PPCCacheControl cache_control = cpu->cache_control;
++    u32 runtime_cpu = cpu->runtime_cpu;
+ 
+     memset(cpu, 0, sizeof(*cpu));
+     cpu->ram = ram;
+@@ -102,6 +103,7 @@
+     cpu->spr_read = spr_read;
+     cpu->spr_write = spr_write;
+     cpu->cache_control = cache_control;
++    cpu->runtime_cpu = runtime_cpu;
+ 
+     if (cpu->ram)
+         memset(cpu->ram, 0, cpu->ram_size);
+@@ -460,6 +462,14 @@
+     [1022] = SPR_RW,
+ };
+ 
++/* HID4 exists on Broadway but not Gekko. A callback is still required;
++   legality here must not invent hardware storage or side effects. */
++static u8 ppc_runtime_spr_access(const CPUState* cpu, u16 spr) {
++    if (spr == 1011)
++        return cpu->runtime_cpu == PPC_RUNTIME_BROADWAY ? SPR_READ | SPR_WRITE : 0;
++    return spr < 1024 ? ppc_spr_access[spr] : 0;
++}
++
+ u32 ppc_mfspr(CPUState* cpu, u16 spr, u32 cia) {
+     if ((cpu->msr & PPC_MSR_PR) && spr != 1 && spr != 8 && spr != 9 &&
+         spr != 268 && spr != 269) {
+@@ -485,7 +495,8 @@
+     case 282:
+         return cpu->ear;
+     case 287:
+-        return cpu->spr_read ? cpu->spr_read(cpu, spr, cia) : PPC_GEKKO_PVR;
++        return cpu->spr_read ? cpu->spr_read(cpu, spr, cia) :
++            (cpu->runtime_cpu == PPC_RUNTIME_BROADWAY ? PPC_BROADWAY_PVR : PPC_GEKKO_PVR);
+     case 912:
+     case 913:
+     case 914:
+@@ -501,7 +512,7 @@
+         break;
+     }
+ 
+-    if (spr < 1024 && (ppc_spr_access[spr] & SPR_READ) && cpu->spr_read)
++    if (spr < 1024 && (ppc_runtime_spr_access(cpu, spr) & SPR_READ) && cpu->spr_read)
+         return cpu->spr_read(cpu, spr, cia);
+ 
+     ppc_program_exception(cpu, PPC_PROGRAM_ILLEGAL, cia);
+@@ -562,7 +573,7 @@
+         break;
+     }
+ 
+-    if (spr < 1024 && (ppc_spr_access[spr] & SPR_WRITE) && cpu->spr_write) {
++    if (spr < 1024 && (ppc_runtime_spr_access(cpu, spr) & SPR_WRITE) && cpu->spr_write) {
+         cpu->spr_write(cpu, spr, value, cia);
+         return;
+     }
+--- a/src/cpu/cpu.h
++++ b/src/cpu/cpu.h
+@@ -39,6 +39,11 @@
+ #define PPC_HID2_DCHEE  0x00080000u
+ 
+ #define PPC_GEKKO_PVR 0x00083214u
++#define PPC_BROADWAY_PVR 0x00087102u
++
++/* Runtime selection is independent of decoder selection. Zero preserves the
++   Gekko default. Hosts must opt in; allocating MEM2 is not CPU identification. */
++enum { PPC_RUNTIME_GEKKO = 0, PPC_RUNTIME_BROADWAY = 1 };
+ 
+ typedef struct CPUState CPUState;
+ typedef u64 (*PPCExternalRead)(CPUState* cpu, u32 ea, u8 size);
+@@ -122,6 +127,8 @@
+     PPCSPRRead spr_read;
+     PPCSPRWrite spr_write;
+     PPCCacheControl cache_control;
++    /* Appended to avoid moving existing fields; rebuild every ABI consumer. */
++    u32 runtime_cpu;
+ };
+ 
+ typedef void (*PPCMemWriteJournal)(u32 offset, u32 size, void* user);
+--- a/tests/test_module_abi.c
++++ b/tests/test_module_abi.c
+@@ -23,7 +23,7 @@
+ 
+ int main(void) {
+ #if UINTPTR_MAX == UINT64_MAX
+-    CHECK(sizeof(CPUState) == 3536u);
++    CHECK(sizeof(CPUState) == 3544u);
+     CHECK(offsetof(CPUState, downcount) == 3480u);
+     CHECK(offsetof(CPUState, cycle_budget) == 3488u);
+     CHECK(offsetof(CPUState, exram) == 3496u);
+@@ -31,6 +31,7 @@
+     CHECK(offsetof(CPUState, spr_read) == 3512u);
+     CHECK(offsetof(CPUState, spr_write) == 3520u);
+     CHECK(offsetof(CPUState, cache_control) == 3528u);
++    CHECK(offsetof(CPUState, runtime_cpu) == 3536u);
+ #endif
+     const DolRecompVariantV4 variants[] = {
+         {DOLRECOMP_FEATURE_X86_V2, DOLRECOMP_SEMANTICS_EXACT, v2, "v2"},
+@@ -42,6 +43,12 @@
+         DOLRECOMP_MODULE_ABI_V4, sizeof(CPUState), 4, variants, NULL,
+     };
+     DolRecompLoadedModule loaded;
++    /* The unchanged module descriptor has an explicit state-size gate.
++       Modules built against the pre-Broadway CPUState must fail that gate. */
++    module.cpu_state_size = sizeof(CPUState) - 8u;
++    CHECK(!dolrecomp_select_module(&module, DOLRECOMP_FEATURE_X86_V3,
++                                   DOLRECOMP_SEMANTICS_EXACT, &loaded, NULL));
++    module.cpu_state_size = sizeof(CPUState);
+     CHECK(dolrecomp_select_module(&module, DOLRECOMP_FEATURE_X86_V3,
+                                   DOLRECOMP_SEMANTICS_EXACT, &loaded, stderr));
+     CHECK(loaded.dispatch == v3);
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -656,3 +656,8 @@
+         set_tests_properties(llvm_variant_runtime PROPERTIES DEPENDS llvm_pipeline)
+     endif()
+ endif()
++
++# Synthetic C-runtime legality checks; no game binaries needed.
++add_executable(broadway_spr_test tests/test_broadway_spr.c)
++target_link_libraries(broadway_spr_test PRIVATE dr_cpu)
++add_test(NAME broadway_spr COMMAND broadway_spr_test)
+--- /dev/null
++++ b/tests/test_broadway_spr.c
+@@ -0,0 +1,38 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++/* Synthetic runtime variant/SPR dispatch regressions; no game data. */
++#include "cpu/cpu.h"
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++static unsigned checks, reads, writes;
++static u32 received, origin;
++#define CHECK(x) do { ++checks; if (!(x)) { fprintf(stderr,"FAIL %d: %s\n",__LINE__,#x); exit(1); } } while(0)
++static u32 get(CPUState*c,u16 s,u32 pc){(void)c;CHECK(s==1011);++reads;origin=pc;return 0x13579bdf;}
++static void put(CPUState*c,u16 s,u32 v,u32 pc){(void)c;CHECK(s==1011);++writes;received=v;origin=pc;}
++static void setup(CPUState*c,u32 variant){memset(c,0,sizeof(*c));c->runtime_cpu=variant;c->spr_read=get;c->spr_write=put;reads=writes=0;}
++int main(void){CPUState c;
++    for(unsigned variant=0;variant<3;++variant){
++        setup(&c,variant);u32 value=ppc_mfspr(&c,1011,0x1000);
++        if(variant==PPC_RUNTIME_BROADWAY){CHECK(!c.exception&&reads==1&&value==0x13579bdf&&origin==0x1000);}
++        else CHECK(c.program_exception==PPC_PROGRAM_ILLEGAL&&reads==0&&c.srr0==0x1000);
++        setup(&c,variant);ppc_mtspr(&c,1011,0x2468ace0,0x1004);
++        if(variant==PPC_RUNTIME_BROADWAY)CHECK(!c.exception&&writes==1&&received==0x2468ace0&&origin==0x1004);
++        else CHECK(c.program_exception==PPC_PROGRAM_ILLEGAL&&writes==0&&c.srr0==0x1004);
++        setup(&c,variant);c.msr=0x4000;(void)ppc_mfspr(&c,1011,0x1008);
++        CHECK(c.program_exception==PPC_PROGRAM_PRIV&&reads==0&&c.srr0==0x1008);
++        setup(&c,variant);c.msr=0x4000;ppc_mtspr(&c,1011,0,0x100c);
++        CHECK(c.program_exception==PPC_PROGRAM_PRIV&&writes==0&&c.srr0==0x100c);
++    }
++    setup(&c,PPC_RUNTIME_BROADWAY);c.spr_read=NULL;(void)ppc_mfspr(&c,1011,0x1010);
++    CHECK(c.program_exception==PPC_PROGRAM_ILLEGAL);
++    setup(&c,PPC_RUNTIME_BROADWAY);c.spr_write=NULL;ppc_mtspr(&c,1011,0,0x1014);
++    CHECK(c.program_exception==PPC_PROGRAM_ILLEGAL);
++    const u16 reserved[]={1012,1023,1024,65535};
++    for(unsigned i=0;i<4;++i){setup(&c,PPC_RUNTIME_BROADWAY);(void)ppc_mfspr(&c,reserved[i],0x1018);CHECK(c.program_exception==PPC_PROGRAM_ILLEGAL&&reads==0);
++        setup(&c,PPC_RUNTIME_BROADWAY);ppc_mtspr(&c,reserved[i],0,0x101c);CHECK(c.program_exception==PPC_PROGRAM_ILLEGAL&&writes==0);}
++    setup(&c,PPC_RUNTIME_BROADWAY);cpu_reset(&c);CHECK(c.runtime_cpu==PPC_RUNTIME_BROADWAY&&c.spr_read==get&&c.spr_write==put);
++    c.spr_read=NULL;CHECK(ppc_mfspr(&c,287,0x1020)==PPC_BROADWAY_PVR);
++    c.runtime_cpu=PPC_RUNTIME_GEKKO;CHECK(ppc_mfspr(&c,287,0x1024)==PPC_GEKKO_PVR);
++    CHECK(cpu_init(&c));CHECK(c.runtime_cpu==PPC_RUNTIME_GEKKO);cpu_free(&c);
++    printf("PASS: Broadway HID4 legality; %u checks\n",checks);return 0;
++}
