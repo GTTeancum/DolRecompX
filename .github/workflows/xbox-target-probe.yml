@@ -3,7 +3,7 @@ name: Xbox target probe
 on:
   push:
     branches: [xbox/bootstrap]
-    paths: [.github/workflows/xbox-target-probe.yml]
+    paths: [.github/workflows/xbox-target-probe.yml, patches/xbox/0001-pre-sse2-fence.patch]
   workflow_dispatch:
 
 permissions:
@@ -13,11 +13,13 @@ jobs:
   nxdk-probe:
     runs-on: ubuntu-22.04
     timeout-minutes: 15
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.sha }}
           submodules: recursive
-          persist-credentials: false
       - uses: actions/checkout@v4
         with:
           repository: XboxDev/nxdk
@@ -27,20 +29,26 @@ jobs:
           persist-credentials: false
       - name: Install host tools
         run: sudo apt-get update && sudo apt-get install -y clang lld llvm
-      - name: Export pinned SDK sources (no game files)
+      - name: Apply exact fence repair, or verify already applied
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p export evidence
-          git -C sdk/nxdk rev-parse HEAD > export/NXDK-REVISION.txt
-          git -C sdk/nxdk submodule status --recursive > export/NXDK-SUBMODULES.txt
-          tar --exclude-vcs -C sdk -czf export/nxdk-source.tar.gz nxdk
-          sha256sum export/nxdk-source.tar.gz > export/SHA256SUMS.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: nxdk-pinned-source
-          path: export/
-          retention-days: 14
+          mkdir -p evidence export
+          patch=patches/xbox/0001-pre-sse2-fence.patch
+          if git apply --reverse --check "$patch" 2>/dev/null; then
+            echo 'Fence repair already present'
+          else
+            git apply --check "$patch"
+            git apply "$patch"
+          fi
+      - name: Test host CPU semantics and CLI regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOLRECOMP_ENABLE_LLVM=OFF
+          cmake --build build --parallel 2
+          ctest --test-dir build --output-on-failure | tee evidence/ctest.log
+          python3 tests/test_cli_offline.py --dolrecomp "$PWD/build/dolrecomp" 2>&1 | tee evidence/offline-cli.log
       - name: Build SDK hello XBE (toolchain check, not game boot)
         shell: bash
         run: |
@@ -50,17 +58,47 @@ jobs:
           clang --version > evidence/compiler.txt
           make -C "$NXDK_DIR/samples/hello" GEN_XISO= -j2 V=1 2>&1 | tee evidence/nxdk-hello-build.log
           cp "$NXDK_DIR/samples/hello/bin/default.xbe" evidence/nxdk-hello.xbe
-      - name: Probe unmodified CPU helpers for Xbox
+      - name: Verify real Xbox CPU object and pre-SSE2 fence
         shell: bash
         run: |
           set -euo pipefail
           export NXDK_DIR="$PWD/sdk/nxdk"
           export PATH="$NXDK_DIR/bin:$PATH"
-          nxdk-cc -std=c11 -O1 -Isrc -c src/cpu/cpu.c -o evidence/cpu-xbox.obj 2>&1 | tee evidence/cpu-xbox-build.log
+          nxdk-cc -std=c11 -O1 -fno-fast-math -ffp-contract=off -frounding-math -Werror=implicit-function-declaration -Isrc -c src/cpu/cpu.c -o evidence/cpu-xbox.obj 2>&1 | tee evidence/cpu-xbox-build.log
           llvm-readobj --file-headers evidence/cpu-xbox.obj > evidence/cpu-xbox-format.txt
+          grep -q IMAGE_FILE_MACHINE_I386 evidence/cpu-xbox-format.txt
+          llvm-objdump -d evidence/cpu-xbox.obj > evidence/cpu-xbox-disassembly.txt
+          if grep -w mfence evidence/cpu-xbox-disassembly.txt; then exit 1; fi
+          cp sdk/nxdk/lib/pdclib/platform/xbox/functions/math/fma.c evidence/nxdk-fma-not-implemented.c
+      - name: Commit only the tested CPU fix to the development branch
+        if: github.ref == 'refs/heads/xbox/bootstrap'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! git diff --quiet -- src/cpu/cpu.c; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add src/cpu/cpu.c
+            git commit -m 'fix: replace SSE2 fence with locked exchange on 32-bit x86'
+            git push origin HEAD:refs/heads/xbox/bootstrap
+          fi
+          git rev-parse HEAD > evidence/REVISION.txt
+      - name: Export complete tested source (no game files)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp evidence/REVISION.txt export/
+          git submodule status --recursive > export/SUBMODULES.txt
+          tar --exclude-vcs --exclude='./sdk' --exclude='./build' --exclude='./export' --exclude='./evidence' -czf export/DolRecompX-B002-source.tar.gz .
+          sha256sum export/DolRecompX-B002-source.tar.gz > export/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: nxdk-target-evidence
           path: evidence/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DolRecompX-B002-source
+          path: export/
           retention-days: 14
