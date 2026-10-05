@@ -656,3 +656,8 @@ if(DOLRECOMP_ENABLE_LLVM)
         set_tests_properties(llvm_variant_runtime PROPERTIES DEPENDS llvm_pipeline)
     endif()
 endif()
+
+# Synthetic C-runtime legality checks; no game binaries needed.
+add_executable(broadway_spr_test tests/test_broadway_spr.c)
+target_link_libraries(broadway_spr_test PRIVATE dr_cpu)
+add_test(NAME broadway_spr COMMAND broadway_spr_test)

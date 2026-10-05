@@ -85,6 +85,7 @@ void cpu_reset(CPUState* cpu) {
     PPCSPRRead spr_read = cpu->spr_read;
     PPCSPRWrite spr_write = cpu->spr_write;
     PPCCacheControl cache_control = cpu->cache_control;
+    u32 runtime_cpu = cpu->runtime_cpu;
 
     memset(cpu, 0, sizeof(*cpu));
     cpu->ram = ram;
@@ -102,6 +103,7 @@ void cpu_reset(CPUState* cpu) {
     cpu->spr_read = spr_read;
     cpu->spr_write = spr_write;
     cpu->cache_control = cache_control;
+    cpu->runtime_cpu = runtime_cpu;
 
     if (cpu->ram)
         memset(cpu->ram, 0, cpu->ram_size);
@@ -460,6 +462,14 @@ static const u8 ppc_spr_access[1024] = {
     [1022] = SPR_RW,
 };
 
+/* HID4 exists on Broadway but not Gekko. A callback is still required;
+   legality here must not invent hardware storage or side effects. */
+static u8 ppc_runtime_spr_access(const CPUState* cpu, u16 spr) {
+    if (spr == 1011)
+        return cpu->runtime_cpu == PPC_RUNTIME_BROADWAY ? SPR_READ | SPR_WRITE : 0;
+    return spr < 1024 ? ppc_spr_access[spr] : 0;
+}
+
 u32 ppc_mfspr(CPUState* cpu, u16 spr, u32 cia) {
     if ((cpu->msr & PPC_MSR_PR) && spr != 1 && spr != 8 && spr != 9 &&
         spr != 268 && spr != 269) {
@@ -485,7 +495,8 @@ u32 ppc_mfspr(CPUState* cpu, u16 spr, u32 cia) {
     case 282:
         return cpu->ear;
     case 287:
-        return cpu->spr_read ? cpu->spr_read(cpu, spr, cia) : PPC_GEKKO_PVR;
+        return cpu->spr_read ? cpu->spr_read(cpu, spr, cia) :
+            (cpu->runtime_cpu == PPC_RUNTIME_BROADWAY ? PPC_BROADWAY_PVR : PPC_GEKKO_PVR);
     case 912:
     case 913:
     case 914:
@@ -501,7 +512,7 @@ u32 ppc_mfspr(CPUState* cpu, u16 spr, u32 cia) {
         break;
     }
 
-    if (spr < 1024 && (ppc_spr_access[spr] & SPR_READ) && cpu->spr_read)
+    if (spr < 1024 && (ppc_runtime_spr_access(cpu, spr) & SPR_READ) && cpu->spr_read)
         return cpu->spr_read(cpu, spr, cia);
 
     ppc_program_exception(cpu, PPC_PROGRAM_ILLEGAL, cia);
@@ -562,7 +573,7 @@ void ppc_mtspr(CPUState* cpu, u16 spr, u32 value, u32 cia) {
         break;
     }
 
-    if (spr < 1024 && (ppc_spr_access[spr] & SPR_WRITE) && cpu->spr_write) {
+    if (spr < 1024 && (ppc_runtime_spr_access(cpu, spr) & SPR_WRITE) && cpu->spr_write) {
         cpu->spr_write(cpu, spr, value, cia);
         return;
     }

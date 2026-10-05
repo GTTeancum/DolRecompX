@@ -39,6 +39,11 @@
 #define PPC_HID2_DCHEE  0x00080000u
 
 #define PPC_GEKKO_PVR 0x00083214u
+#define PPC_BROADWAY_PVR 0x00087102u
+
+/* Runtime selection is independent of decoder selection. Zero preserves the
+   Gekko default. Hosts must opt in; allocating MEM2 is not CPU identification. */
+enum { PPC_RUNTIME_GEKKO = 0, PPC_RUNTIME_BROADWAY = 1 };
 
 typedef struct CPUState CPUState;
 typedef u64 (*PPCExternalRead)(CPUState* cpu, u32 ea, u8 size);
@@ -122,6 +127,8 @@ struct CPUState {
     PPCSPRRead spr_read;
     PPCSPRWrite spr_write;
     PPCCacheControl cache_control;
+    /* Appended to avoid moving existing fields; rebuild every ABI consumer. */
+    u32 runtime_cpu;
 };
 
 typedef void (*PPCMemWriteJournal)(u32 offset, u32 size, void* user);
