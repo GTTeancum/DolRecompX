@@ -1,0 +1,55 @@
+name: Xbox bootstrap baseline
+
+on:
+  push:
+    branches: [xbox/bootstrap]
+    paths: [.github/workflows/xbox-bootstrap.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  c-backend-baseline:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - name: Export reproducible source snapshot (no game files)
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p export
+          git rev-parse HEAD > export/REVISION.txt
+          git submodule status --recursive > export/SUBMODULES.txt
+          tar --exclude-vcs --exclude='./export' --exclude='./build' -czf export/DolRecompX-source.tar.gz .
+          sha256sum export/DolRecompX-source.tar.gz > export/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DolRecompX-bootstrap-source
+          path: export/
+          retention-days: 14
+      - name: Configure portable C backend
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDOLRECOMP_ENABLE_LLVM=OFF
+      - name: Build
+        run: cmake --build build --parallel 2
+      - name: Test baseline
+        run: ctest --test-dir build --output-on-failure
+      - name: Collect build evidence
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p evidence
+          cp export/REVISION.txt export/SUBMODULES.txt evidence/
+          cp build/Testing/Temporary/LastTest.log evidence/ 2>/dev/null || true
+          cp build/CMakeCache.txt evidence/ 2>/dev/null || true
+          find build -maxdepth 2 -type f -iname '*dolrecomp*' -executable -exec cp {} evidence/ \;
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DolRecompX-c-backend-baseline
+          path: evidence/
+          retention-days: 14
