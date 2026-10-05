@@ -157,14 +157,33 @@ bool cpu_alloc_mem2(CPUState* cpu, u32 size); //mem 2 only exists after first al
 void cpu_free(CPUState* cpu);
 void cpu_reset(CPUState* cpu);
 
-u64  mem_read64(CPUState* cpu, u32 addr);
-void mem_write64(CPUState* cpu, u32 addr, u64 value);
-u32  mem_read32(CPUState* cpu, u32 addr);
-void mem_write32(CPUState* cpu, u32 addr, u32 value);
-u16  mem_read16(CPUState* cpu, u32 addr);
-void mem_write16(CPUState* cpu, u32 addr, u16 value);
-u8   mem_read8(CPUState* cpu, u32 addr);
-void mem_write8(CPUState* cpu, u32 addr, u8 value);
+/* Opt-in 32-bit x86 memory-helper ABI. All users and the runtime must be
+   rebuilt with the same setting. SDK calls and external callbacks keep their
+   existing conventions. PE/COFF fastcall symbol decoration rejects mixed
+   memory-helper objects at link time; other formats need build-level gating. */
+#if defined(DOLRECOMP_X86_FASTCALL) && DOLRECOMP_X86_FASTCALL
+# if !defined(__i386__) && !defined(_M_IX86)
+#  error "DOLRECOMP_X86_FASTCALL requires 32-bit x86"
+# endif
+# if defined(__clang__) || defined(__GNUC__)
+#  define PPC_MEM_ABI __attribute__((fastcall))
+# elif defined(_MSC_VER)
+#  define PPC_MEM_ABI __fastcall
+# else
+#  error "Unsupported compiler for DOLRECOMP_X86_FASTCALL"
+# endif
+#else
+# define PPC_MEM_ABI
+#endif
+
+u64  PPC_MEM_ABI mem_read64(CPUState* cpu, u32 addr);
+void PPC_MEM_ABI mem_write64(CPUState* cpu, u32 addr, u64 value);
+u32  PPC_MEM_ABI mem_read32(CPUState* cpu, u32 addr);
+void PPC_MEM_ABI mem_write32(CPUState* cpu, u32 addr, u32 value);
+u16  PPC_MEM_ABI mem_read16(CPUState* cpu, u32 addr);
+void PPC_MEM_ABI mem_write16(CPUState* cpu, u32 addr, u16 value);
+u8   PPC_MEM_ABI mem_read8(CPUState* cpu, u32 addr);
+void PPC_MEM_ABI mem_write8(CPUState* cpu, u32 addr, u8 value);
 
 f64 ppc_approx_reciprocal(f64 value);
 f64 ppc_approx_rsqrt(f64 value);
