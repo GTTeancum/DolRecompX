@@ -1,0 +1,183 @@
+--- a/src/cpu/cpu.c
++++ b/src/cpu/cpu.c
+@@ -14,6 +14,14 @@
+ void ppc_set_mem_write_journal(PPCMemWriteJournal fn, void* user) {
+     g_mem_write_journal = fn;
+     g_mem_write_journal_user = user;
++}
++
++PPCMemWriteCheck g_mem_write_check = NULL;
++void* g_mem_write_check_user = NULL;
++
++void ppc_set_mem_write_check(PPCMemWriteCheck fn, void* user) {
++    g_mem_write_check = fn;
++    g_mem_write_check_user = user;
+ }
+ 
+ #if defined(_MSC_VER)
+@@ -143,10 +151,13 @@
+     return NULL;
+ }
+ 
+-static void clear_matching_reservation(CPUState* cpu, u32 addr) {
+-    const u32 reserve_addr = cpu->reserve_addr & ~0x40000000u;
+-    const u32 store_addr = addr & ~0x40000000u;
+-    if (cpu->reserve_valid && ((reserve_addr ^ store_addr) & ~31u) == 0)
++void ppc_clear_reservation_for_store(CPUState* cpu, u32 addr, u32 size) {
++    /* Cached, uncached and physical aliases share a reservation. MEM2 keeps
++       its 0x10000000 bank bit. Caller has validated the entire RAM access. */
++    const u32 line = (cpu->reserve_addr & 0x1FFFFFFFu) & ~31u;
++    const u32 start = addr & 0x1FFFFFFFu;
++    if (cpu->reserve_valid && size && (u64)start < (u64)line + 32u &&
++        (u64)start + size > line)
+         cpu->reserve_valid = false;
+ }
+ 
+@@ -213,8 +224,12 @@
+         fprintf(stderr, "warn: write64 to unmapped 0x%08X\n", addr);
+         return;
+     }
+-    clear_matching_reservation(cpu, addr);
+-    if (g_mem_write_journal && host >= cpu->ram && host < cpu->ram + cpu->ram_size)
++    if (g_mem_write_check)
++        g_mem_write_check(cpu, addr, value, 8, g_mem_write_check_user);
++    ppc_clear_reservation_for_store(cpu, addr, 8);
++    if (g_mem_write_journal &&
++        ((addr >= GC_RAM_BASE && addr - GC_RAM_BASE < cpu->ram_size) ||
++         (addr >= GC_RAM_UNCACHED && addr - GC_RAM_UNCACHED < cpu->ram_size)))
+         g_mem_write_journal((u32)(host - cpu->ram), 8, g_mem_write_journal_user);
+     write_be64(host, value);
+ }
+@@ -242,8 +257,12 @@
+         fprintf(stderr, "warn: write32 to unmapped 0x%08X\n", addr);
+         return;
+     }
+-    clear_matching_reservation(cpu, addr);
+-    if (g_mem_write_journal && host >= cpu->ram && host < cpu->ram + cpu->ram_size)
++    if (g_mem_write_check)
++        g_mem_write_check(cpu, addr, value, 4, g_mem_write_check_user);
++    ppc_clear_reservation_for_store(cpu, addr, 4);
++    if (g_mem_write_journal &&
++        ((addr >= GC_RAM_BASE && addr - GC_RAM_BASE < cpu->ram_size) ||
++         (addr >= GC_RAM_UNCACHED && addr - GC_RAM_UNCACHED < cpu->ram_size)))
+         g_mem_write_journal((u32)(host - cpu->ram), 4, g_mem_write_journal_user);
+     write_be32(host, value);
+ }
+@@ -271,8 +290,12 @@
+         fprintf(stderr, "warn: write16 to unmapped 0x%08X\n", addr);
+         return;
+     }
+-    clear_matching_reservation(cpu, addr);
+-    if (g_mem_write_journal && host >= cpu->ram && host < cpu->ram + cpu->ram_size)
++    if (g_mem_write_check)
++        g_mem_write_check(cpu, addr, value, 2, g_mem_write_check_user);
++    ppc_clear_reservation_for_store(cpu, addr, 2);
++    if (g_mem_write_journal &&
++        ((addr >= GC_RAM_BASE && addr - GC_RAM_BASE < cpu->ram_size) ||
++         (addr >= GC_RAM_UNCACHED && addr - GC_RAM_UNCACHED < cpu->ram_size)))
+         g_mem_write_journal((u32)(host - cpu->ram), 2, g_mem_write_journal_user);
+     write_be16(host, value);
+ }
+@@ -300,8 +323,12 @@
+         fprintf(stderr, "warn: write8 to unmapped 0x%08X\n", addr);
+         return;
+     }
+-    clear_matching_reservation(cpu, addr);
+-    if (g_mem_write_journal && host >= cpu->ram && host < cpu->ram + cpu->ram_size)
++    if (g_mem_write_check)
++        g_mem_write_check(cpu, addr, value, 1, g_mem_write_check_user);
++    ppc_clear_reservation_for_store(cpu, addr, 1);
++    if (g_mem_write_journal &&
++        ((addr >= GC_RAM_BASE && addr - GC_RAM_BASE < cpu->ram_size) ||
++         (addr >= GC_RAM_UNCACHED && addr - GC_RAM_UNCACHED < cpu->ram_size)))
+         g_mem_write_journal((u32)(host - cpu->ram), 1, g_mem_write_journal_user);
+     *host = value;
+ }
+--- a/src/cpu/cpu.h
++++ b/src/cpu/cpu.h
+@@ -136,6 +136,22 @@
+ extern void* g_mem_write_journal_user;
+ void ppc_set_mem_write_journal(PPCMemWriteJournal fn, void* user);
+ 
++/* Optional pre-store policy for mapped scalar RAM writes. Invoked before RAM,
++   reservation or journal side effects. Value is the low size*8 bits in guest
++   big-endian order; size is 1/2/4/8. A rejecting callback must not return.
++   External-write providers must enforce their own policy after validating the
++   complete access. Process-global like the legacy journal: serialize users.
++   This adds no CPUState fields and does not change the journal ABI. */
++typedef void (*PPCMemWriteCheck)(CPUState* cpu, u32 address, u64 value,
++                                 u8 size, void* user);
++extern PPCMemWriteCheck g_mem_write_check;
++extern void* g_mem_write_check_user;
++void ppc_set_mem_write_check(PPCMemWriteCheck fn, void* user);
++/* After validating a store, invalidate a reservation on any overlapped 32-byte
++   line. Uses the same fixed MEM1/MEM2 alias model as the scalar RAM helpers. */
++void ppc_clear_reservation_for_store(CPUState* cpu, u32 address, u32 size);
++
++
+ bool cpu_init(CPUState* cpu);
+ bool cpu_alloc_mem2(CPUState* cpu, u32 size); //mem 2 only exists after first aloc
+ void cpu_free(CPUState* cpu);
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -661,3 +661,7 @@
+ add_executable(broadway_spr_test tests/test_broadway_spr.c)
+ target_link_libraries(broadway_spr_test PRIVATE dr_cpu)
+ add_test(NAME broadway_spr COMMAND broadway_spr_test)
++
++add_executable(mem_write_check_test tests/test_mem_write_check.c)
++target_link_libraries(mem_write_check_test PRIVATE dr_cpu)
++add_test(NAME mem_write_check COMMAND mem_write_check_test)
+--- /dev/null
++++ b/tests/test_mem_write_check.c
+@@ -0,0 +1,50 @@
++/* SPDX-License-Identifier: GPL-3.0-or-later */
++#include "cpu/cpu.h"
++#include <setjmp.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++static unsigned checks,cases,observed,journaled,reject_write,expected_width,bank;
++static u32 expected_address;static u64 expected_value;static jmp_buf escape;
++#define CHECK(x) do{++checks;if(!(x)){fprintf(stderr,"FAIL case %u line %u: %s\n",cases,__LINE__,#x);exit(1);}}while(0)
++static void before(CPUState *c,u32 a,u64 v,u8 n,void *user){
++    CHECK(user==c);CHECK(a==expected_address);CHECK(v==expected_value);CHECK(n==expected_width);
++    CHECK(c->reserve_valid);CHECK(journaled==0);
++    const u8 *p=(bank?c->mem2:c->ram)+(a&0xfff);
++    for(unsigned j=0;j<n;++j)CHECK(p[j]==0);
++    ++observed;if(reject_write)longjmp(escape,1);
++}
++static void journal(u32 a,u32 n,void *u){
++    CPUState *c=u;CHECK(a==(expected_address&0xfff));CHECK(n==expected_width);
++    CHECK(observed==1);CHECK(!c->reserve_valid);++journaled;
++}
++static void store(CPUState *c,u32 a,u64 v,unsigned n){
++    switch(n){case 1:mem_write8(c,a,(u8)v);break;case 2:mem_write16(c,a,(u16)v);break;
++        case 4:mem_write32(c,a,(u32)v);break;case 8:mem_write64(c,a,v);break;default:abort();}
++}
++int main(void){
++    CPUState *c=calloc(1,sizeof(*c));CHECK(c);
++    c->ram_size=c->mem2_size=4096;c->ram=calloc(1,4096);c->mem2=calloc(1,4096);CHECK(c->ram&&c->mem2);
++    for(bank=0;bank<2;++bank)for(unsigned alias=0;alias<2;++alias)
++    for(expected_width=1;expected_width<=8;expected_width*=2)for(reject_write=0;reject_write<2;++reject_write){
++        ++cases;memset(c->ram,0,4096);memset(c->mem2,0,4096);observed=journaled=0;
++        expected_address=(bank?0x90000000u:0x80000000u)|(alias?0x40000000u:0)|0x40;
++        expected_value=UINT64_C(0x123456789abcdef0);if(expected_width<8)expected_value&=(UINT64_C(1)<<(8*expected_width))-1;
++        c->reserve_valid=true;c->reserve_addr=expected_address^0x40000000u;
++        ppc_set_mem_write_journal(journal,c);ppc_set_mem_write_check(before,c);
++        if(!setjmp(escape)){store(c,expected_address,expected_value,expected_width);CHECK(!reject_write);}
++        CHECK(observed==1);CHECK(journaled==(reject_write||bank?0u:1u));CHECK(c->reserve_valid==(reject_write!=0));
++        u8 *p=(bank?c->mem2:c->ram)+0x40;
++        for(unsigned j=0;j<expected_width;++j)CHECK(p[j]==(reject_write?0:(u8)(expected_value>>(8*(expected_width-j-1)))));
++    }
++    ppc_set_mem_write_check(NULL,NULL);ppc_set_mem_write_journal(NULL,NULL);
++    /* A wide unaligned scalar access can overlap the reserved line at its tail. */
++    for(unsigned b=0;b<2;++b)for(unsigned a=0;a<3;++a){
++        const u32 bases[]={0,0x80000000u,0xc0000000u};++cases;
++        c->reserve_addr=(b?0x90000000u:0x80000000u)+0x60;c->reserve_valid=true;
++        ppc_clear_reservation_for_store(c,bases[a]+(b?0x10000000u:0)+0x5c,8);CHECK(!c->reserve_valid);
++        c->reserve_valid=true;ppc_clear_reservation_for_store(c,bases[a]+(b?0:0x10000000u)+0x5c,8);CHECK(c->reserve_valid);
++        ppc_clear_reservation_for_store(c,bases[a]+(b?0x10000000u:0)+0x5c,4);CHECK(c->reserve_valid);
++    }
++    cpu_free(c);free(c);printf("PASS: %u pre-store policy cases; %u checks\n",cases,checks);return 0;
++}
