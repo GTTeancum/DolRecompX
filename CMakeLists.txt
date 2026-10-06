@@ -669,3 +669,15 @@ add_test(NAME mem_write_check COMMAND mem_write_check_test)
 add_executable(timebase_access_test tests/test_timebase_access.c)
 target_link_libraries(timebase_access_test PRIVATE dr_cpu)
 add_test(NAME timebase_access COMMAND timebase_access_test)
+
+# Reference metadata only: this does not enable a guest clock or change emission.
+add_executable(functional_costs_test tests/test_functional_costs.c)
+target_link_libraries(functional_costs_test PRIVATE dr_frontend)
+add_test(NAME functional_costs COMMAND functional_costs_test)
+find_package(Python3 COMPONENTS Interpreter QUIET)
+if(Python3_Interpreter_FOUND AND NOT CMAKE_CROSSCOMPILING AND
+   CMAKE_C_COMPILER_ID MATCHES "GNU|Clang" AND NOT MSVC)
+    add_test(NAME functional_cost_manifest
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_functional_cost_manifest.py
+                --cc-path ${CMAKE_C_COMPILER})
+endif()

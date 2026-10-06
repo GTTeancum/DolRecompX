@@ -7,6 +7,11 @@
 *.md text eol=lf
 *.txt text eol=lf
 
+# Public-source fingerprints and generated manifests use canonical LF bytes.
+tools/timing/** text eol=lf
+# Retain the reference snapshot byte-for-byte, including its final blank line.
+tools/timing/reference/PPCTables.cpp whitespace=-blank-at-eof
+
 *.dol binary
 *.elf binary
 *.iso binary

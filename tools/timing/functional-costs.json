@@ -1,0 +1,6204 @@
+{
+  "schema_version": 1,
+  "model_id": "wii-functional-ppctables-0961ec1-public-v1",
+  "timing_abi_version": 1,
+  "model_kind": "static_functional_instruction_cost",
+  "cycle_accurate": false,
+  "limitations": [
+    "Pinned reference metadata, not hardware or complete dynamic emulator timing.",
+    "No cache, pipeline, bus, exception or device latency model.",
+    "Synthetic selector coverage is not exhaustive instruction legality.",
+    "A positive cost does not establish semantic success or retirement."
+  ],
+  "invalid_policy": {
+    "unknown": "reject",
+    "out_of_range": "reject",
+    "embedded_data": "caller_must_reject",
+    "accessor_rejection_sentinel": 0
+  },
+  "provenance": {
+    "reference_revision": "0961ec1d87a51b7ede57cc4df7629b7f92d0d9d8",
+    "reference_url": "https://github.com/dolphin-emu/dolphin/blob/0961ec1d87a51b7ede57cc4df7629b7f92d0d9d8/Source/Core/Core/PowerPC/PPCTables.cpp",
+    "inputs": [
+      {
+        "path": "src/common/types.h",
+        "sha256": "d7280b4787ae7815d143e61942a69f89c4a69c8332599c613a0494bc14b3014d"
+      },
+      {
+        "path": "src/frontend/decoder.c",
+        "sha256": "8f6e7930089aa25a28762a85b9c4caf75e82dc813a9bfce951428dee2acbfd07"
+      },
+      {
+        "path": "src/frontend/decoder.h",
+        "sha256": "27c18a2bf32df9c11e4f7176b94a243bf147a7d10280695e309ca2349a6cf5c0"
+      },
+      {
+        "path": "tools/timing/reference/PPCTables.cpp",
+        "sha256": "bc6ef549497cb67ebfe3e8d7fbb2e484ec00a0887faccbfa2fd95c8ecc7097df"
+      }
+    ],
+    "generator_inputs": [
+      {
+        "path": "tools/timing/generate_costs.py",
+        "sha256": "1f159329e46266eb9b2ecf3f6099dd4f2420c00fe61c3bc847933ce3c330e7e1"
+      },
+      {
+        "path": "tools/timing/reference_tables.py",
+        "sha256": "6ee00db93442b264c3e5cab3f03df1a401f3045a80f9ebfc9c2122578f2c3da9"
+      },
+      {
+        "path": "tools/timing/probe_costs.c",
+        "sha256": "4b003afab4b71a33ce93a471a5d4e4b45d17a00f64cfb1e2f6d9dd82a98df21a"
+      }
+    ]
+  },
+  "synthetic_enumeration": {
+    "schema": "selectors-registers-spr-branches-psq-v1",
+    "cases": 16398400,
+    "known_enum_count": 236
+  },
+  "reference_entries": [
+    {
+      "id": 0,
+      "table": "s_unknown_op_info",
+      "opcode": 0,
+      "name": "unknown_instruction",
+      "type": "Unknown",
+      "cycles": 0,
+      "line": 34,
+      "selector": null
+    },
+    {
+      "id": 1,
+      "table": "s_primary_table",
+      "opcode": 4,
+      "name": "RunTable4",
+      "type": "Subtable",
+      "cycles": 0,
+      "line": 37,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 2,
+      "table": "s_primary_table",
+      "opcode": 19,
+      "name": "RunTable19",
+      "type": "Subtable",
+      "cycles": 0,
+      "line": 38,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 3,
+      "table": "s_primary_table",
+      "opcode": 31,
+      "name": "RunTable31",
+      "type": "Subtable",
+      "cycles": 0,
+      "line": 39,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 4,
+      "table": "s_primary_table",
+      "opcode": 59,
+      "name": "RunTable59",
+      "type": "Subtable",
+      "cycles": 0,
+      "line": 40,
+      "selector": {
+        "primary": 59,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 5,
+      "table": "s_primary_table",
+      "opcode": 63,
+      "name": "RunTable63",
+      "type": "Subtable",
+      "cycles": 0,
+      "line": 41,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 6,
+      "table": "s_primary_table",
+      "opcode": 16,
+      "name": "bcx",
+      "type": "Branch",
+      "cycles": 1,
+      "line": 43,
+      "selector": {
+        "primary": 16,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 7,
+      "table": "s_primary_table",
+      "opcode": 18,
+      "name": "bx",
+      "type": "Branch",
+      "cycles": 1,
+      "line": 44,
+      "selector": {
+        "primary": 18,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 8,
+      "table": "s_primary_table",
+      "opcode": 3,
+      "name": "twi",
+      "type": "System",
+      "cycles": 1,
+      "line": 46,
+      "selector": {
+        "primary": 3,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 9,
+      "table": "s_primary_table",
+      "opcode": 17,
+      "name": "sc",
+      "type": "System",
+      "cycles": 2,
+      "line": 47,
+      "selector": {
+        "primary": 17,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 10,
+      "table": "s_primary_table",
+      "opcode": 7,
+      "name": "mulli",
+      "type": "Integer",
+      "cycles": 3,
+      "line": 49,
+      "selector": {
+        "primary": 7,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 11,
+      "table": "s_primary_table",
+      "opcode": 8,
+      "name": "subfic",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 50,
+      "selector": {
+        "primary": 8,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 12,
+      "table": "s_primary_table",
+      "opcode": 10,
+      "name": "cmpli",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 51,
+      "selector": {
+        "primary": 10,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 13,
+      "table": "s_primary_table",
+      "opcode": 11,
+      "name": "cmpi",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 52,
+      "selector": {
+        "primary": 11,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 14,
+      "table": "s_primary_table",
+      "opcode": 12,
+      "name": "addic",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 53,
+      "selector": {
+        "primary": 12,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 15,
+      "table": "s_primary_table",
+      "opcode": 13,
+      "name": "addic_rc",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 54,
+      "selector": {
+        "primary": 13,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 16,
+      "table": "s_primary_table",
+      "opcode": 14,
+      "name": "addi",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 55,
+      "selector": {
+        "primary": 14,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 17,
+      "table": "s_primary_table",
+      "opcode": 15,
+      "name": "addis",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 56,
+      "selector": {
+        "primary": 15,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 18,
+      "table": "s_primary_table",
+      "opcode": 20,
+      "name": "rlwimix",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 58,
+      "selector": {
+        "primary": 20,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 19,
+      "table": "s_primary_table",
+      "opcode": 21,
+      "name": "rlwinmx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 59,
+      "selector": {
+        "primary": 21,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 20,
+      "table": "s_primary_table",
+      "opcode": 23,
+      "name": "rlwnmx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 60,
+      "selector": {
+        "primary": 23,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 21,
+      "table": "s_primary_table",
+      "opcode": 24,
+      "name": "ori",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 62,
+      "selector": {
+        "primary": 24,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 22,
+      "table": "s_primary_table",
+      "opcode": 25,
+      "name": "oris",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 63,
+      "selector": {
+        "primary": 25,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 23,
+      "table": "s_primary_table",
+      "opcode": 26,
+      "name": "xori",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 64,
+      "selector": {
+        "primary": 26,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 24,
+      "table": "s_primary_table",
+      "opcode": 27,
+      "name": "xoris",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 65,
+      "selector": {
+        "primary": 27,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 25,
+      "table": "s_primary_table",
+      "opcode": 28,
+      "name": "andi_rc",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 66,
+      "selector": {
+        "primary": 28,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 26,
+      "table": "s_primary_table",
+      "opcode": 29,
+      "name": "andis_rc",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 67,
+      "selector": {
+        "primary": 29,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 27,
+      "table": "s_primary_table",
+      "opcode": 32,
+      "name": "lwz",
+      "type": "Load",
+      "cycles": 1,
+      "line": 69,
+      "selector": {
+        "primary": 32,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 28,
+      "table": "s_primary_table",
+      "opcode": 33,
+      "name": "lwzu",
+      "type": "Load",
+      "cycles": 1,
+      "line": 70,
+      "selector": {
+        "primary": 33,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 29,
+      "table": "s_primary_table",
+      "opcode": 34,
+      "name": "lbz",
+      "type": "Load",
+      "cycles": 1,
+      "line": 71,
+      "selector": {
+        "primary": 34,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 30,
+      "table": "s_primary_table",
+      "opcode": 35,
+      "name": "lbzu",
+      "type": "Load",
+      "cycles": 1,
+      "line": 72,
+      "selector": {
+        "primary": 35,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 31,
+      "table": "s_primary_table",
+      "opcode": 40,
+      "name": "lhz",
+      "type": "Load",
+      "cycles": 1,
+      "line": 73,
+      "selector": {
+        "primary": 40,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 32,
+      "table": "s_primary_table",
+      "opcode": 41,
+      "name": "lhzu",
+      "type": "Load",
+      "cycles": 1,
+      "line": 74,
+      "selector": {
+        "primary": 41,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 33,
+      "table": "s_primary_table",
+      "opcode": 42,
+      "name": "lha",
+      "type": "Load",
+      "cycles": 1,
+      "line": 76,
+      "selector": {
+        "primary": 42,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 34,
+      "table": "s_primary_table",
+      "opcode": 43,
+      "name": "lhau",
+      "type": "Load",
+      "cycles": 1,
+      "line": 77,
+      "selector": {
+        "primary": 43,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 35,
+      "table": "s_primary_table",
+      "opcode": 44,
+      "name": "sth",
+      "type": "Store",
+      "cycles": 1,
+      "line": 79,
+      "selector": {
+        "primary": 44,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 36,
+      "table": "s_primary_table",
+      "opcode": 45,
+      "name": "sthu",
+      "type": "Store",
+      "cycles": 1,
+      "line": 80,
+      "selector": {
+        "primary": 45,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 37,
+      "table": "s_primary_table",
+      "opcode": 36,
+      "name": "stw",
+      "type": "Store",
+      "cycles": 1,
+      "line": 81,
+      "selector": {
+        "primary": 36,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 38,
+      "table": "s_primary_table",
+      "opcode": 37,
+      "name": "stwu",
+      "type": "Store",
+      "cycles": 1,
+      "line": 82,
+      "selector": {
+        "primary": 37,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 39,
+      "table": "s_primary_table",
+      "opcode": 38,
+      "name": "stb",
+      "type": "Store",
+      "cycles": 1,
+      "line": 83,
+      "selector": {
+        "primary": 38,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 40,
+      "table": "s_primary_table",
+      "opcode": 39,
+      "name": "stbu",
+      "type": "Store",
+      "cycles": 1,
+      "line": 84,
+      "selector": {
+        "primary": 39,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 41,
+      "table": "s_primary_table",
+      "opcode": 46,
+      "name": "lmw",
+      "type": "System",
+      "cycles": 11,
+      "line": 86,
+      "selector": {
+        "primary": 46,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 42,
+      "table": "s_primary_table",
+      "opcode": 47,
+      "name": "stmw",
+      "type": "System",
+      "cycles": 11,
+      "line": 87,
+      "selector": {
+        "primary": 47,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 43,
+      "table": "s_primary_table",
+      "opcode": 48,
+      "name": "lfs",
+      "type": "LoadFP",
+      "cycles": 1,
+      "line": 89,
+      "selector": {
+        "primary": 48,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 44,
+      "table": "s_primary_table",
+      "opcode": 49,
+      "name": "lfsu",
+      "type": "LoadFP",
+      "cycles": 1,
+      "line": 90,
+      "selector": {
+        "primary": 49,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 45,
+      "table": "s_primary_table",
+      "opcode": 50,
+      "name": "lfd",
+      "type": "LoadFP",
+      "cycles": 1,
+      "line": 92,
+      "selector": {
+        "primary": 50,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 46,
+      "table": "s_primary_table",
+      "opcode": 51,
+      "name": "lfdu",
+      "type": "LoadFP",
+      "cycles": 1,
+      "line": 93,
+      "selector": {
+        "primary": 51,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 47,
+      "table": "s_primary_table",
+      "opcode": 52,
+      "name": "stfs",
+      "type": "StoreFP",
+      "cycles": 1,
+      "line": 96,
+      "selector": {
+        "primary": 52,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 48,
+      "table": "s_primary_table",
+      "opcode": 53,
+      "name": "stfsu",
+      "type": "StoreFP",
+      "cycles": 1,
+      "line": 97,
+      "selector": {
+        "primary": 53,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 49,
+      "table": "s_primary_table",
+      "opcode": 54,
+      "name": "stfd",
+      "type": "StoreFP",
+      "cycles": 1,
+      "line": 99,
+      "selector": {
+        "primary": 54,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 50,
+      "table": "s_primary_table",
+      "opcode": 55,
+      "name": "stfdu",
+      "type": "StoreFP",
+      "cycles": 1,
+      "line": 100,
+      "selector": {
+        "primary": 55,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 51,
+      "table": "s_primary_table",
+      "opcode": 56,
+      "name": "psq_l",
+      "type": "LoadPS",
+      "cycles": 1,
+      "line": 103,
+      "selector": {
+        "primary": 56,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 52,
+      "table": "s_primary_table",
+      "opcode": 57,
+      "name": "psq_lu",
+      "type": "LoadPS",
+      "cycles": 1,
+      "line": 105,
+      "selector": {
+        "primary": 57,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 53,
+      "table": "s_primary_table",
+      "opcode": 60,
+      "name": "psq_st",
+      "type": "StorePS",
+      "cycles": 1,
+      "line": 107,
+      "selector": {
+        "primary": 60,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 54,
+      "table": "s_primary_table",
+      "opcode": 61,
+      "name": "psq_stu",
+      "type": "StorePS",
+      "cycles": 1,
+      "line": 109,
+      "selector": {
+        "primary": 61,
+        "subopcode_bits": null,
+        "subopcode": null
+      }
+    },
+    {
+      "id": 55,
+      "table": "s_table4",
+      "opcode": 0,
+      "name": "ps_cmpu0",
+      "type": "PS",
+      "cycles": 1,
+      "line": 117,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 0
+      }
+    },
+    {
+      "id": 56,
+      "table": "s_table4",
+      "opcode": 32,
+      "name": "ps_cmpo0",
+      "type": "PS",
+      "cycles": 1,
+      "line": 120,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 32
+      }
+    },
+    {
+      "id": 57,
+      "table": "s_table4",
+      "opcode": 40,
+      "name": "ps_neg",
+      "type": "PS",
+      "cycles": 1,
+      "line": 123,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 40
+      }
+    },
+    {
+      "id": 58,
+      "table": "s_table4",
+      "opcode": 136,
+      "name": "ps_nabs",
+      "type": "PS",
+      "cycles": 1,
+      "line": 126,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 136
+      }
+    },
+    {
+      "id": 59,
+      "table": "s_table4",
+      "opcode": 264,
+      "name": "ps_abs",
+      "type": "PS",
+      "cycles": 1,
+      "line": 129,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 264
+      }
+    },
+    {
+      "id": 60,
+      "table": "s_table4",
+      "opcode": 64,
+      "name": "ps_cmpu1",
+      "type": "PS",
+      "cycles": 1,
+      "line": 132,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 64
+      }
+    },
+    {
+      "id": 61,
+      "table": "s_table4",
+      "opcode": 72,
+      "name": "ps_mr",
+      "type": "PS",
+      "cycles": 1,
+      "line": 135,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 72
+      }
+    },
+    {
+      "id": 62,
+      "table": "s_table4",
+      "opcode": 96,
+      "name": "ps_cmpo1",
+      "type": "PS",
+      "cycles": 1,
+      "line": 138,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 96
+      }
+    },
+    {
+      "id": 63,
+      "table": "s_table4",
+      "opcode": 528,
+      "name": "ps_merge00",
+      "type": "PS",
+      "cycles": 1,
+      "line": 141,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 528
+      }
+    },
+    {
+      "id": 64,
+      "table": "s_table4",
+      "opcode": 560,
+      "name": "ps_merge01",
+      "type": "PS",
+      "cycles": 1,
+      "line": 144,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 560
+      }
+    },
+    {
+      "id": 65,
+      "table": "s_table4",
+      "opcode": 592,
+      "name": "ps_merge10",
+      "type": "PS",
+      "cycles": 1,
+      "line": 147,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 592
+      }
+    },
+    {
+      "id": 66,
+      "table": "s_table4",
+      "opcode": 624,
+      "name": "ps_merge11",
+      "type": "PS",
+      "cycles": 1,
+      "line": 150,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 624
+      }
+    },
+    {
+      "id": 67,
+      "table": "s_table4",
+      "opcode": 1014,
+      "name": "dcbz_l",
+      "type": "System",
+      "cycles": 1,
+      "line": 154,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 10,
+        "subopcode": 1014
+      }
+    },
+    {
+      "id": 68,
+      "table": "s_table4_2",
+      "opcode": 10,
+      "name": "ps_sum0",
+      "type": "PS",
+      "cycles": 1,
+      "line": 158,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 10
+      }
+    },
+    {
+      "id": 69,
+      "table": "s_table4_2",
+      "opcode": 11,
+      "name": "ps_sum1",
+      "type": "PS",
+      "cycles": 1,
+      "line": 161,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 11
+      }
+    },
+    {
+      "id": 70,
+      "table": "s_table4_2",
+      "opcode": 12,
+      "name": "ps_muls0",
+      "type": "PS",
+      "cycles": 1,
+      "line": 164,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 12
+      }
+    },
+    {
+      "id": 71,
+      "table": "s_table4_2",
+      "opcode": 13,
+      "name": "ps_muls1",
+      "type": "PS",
+      "cycles": 1,
+      "line": 167,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 13
+      }
+    },
+    {
+      "id": 72,
+      "table": "s_table4_2",
+      "opcode": 14,
+      "name": "ps_madds0",
+      "type": "PS",
+      "cycles": 1,
+      "line": 170,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 14
+      }
+    },
+    {
+      "id": 73,
+      "table": "s_table4_2",
+      "opcode": 15,
+      "name": "ps_madds1",
+      "type": "PS",
+      "cycles": 1,
+      "line": 173,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 15
+      }
+    },
+    {
+      "id": 74,
+      "table": "s_table4_2",
+      "opcode": 18,
+      "name": "ps_div",
+      "type": "PS",
+      "cycles": 17,
+      "line": 176,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 18
+      }
+    },
+    {
+      "id": 75,
+      "table": "s_table4_2",
+      "opcode": 20,
+      "name": "ps_sub",
+      "type": "PS",
+      "cycles": 1,
+      "line": 179,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 20
+      }
+    },
+    {
+      "id": 76,
+      "table": "s_table4_2",
+      "opcode": 21,
+      "name": "ps_add",
+      "type": "PS",
+      "cycles": 1,
+      "line": 182,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 21
+      }
+    },
+    {
+      "id": 77,
+      "table": "s_table4_2",
+      "opcode": 23,
+      "name": "ps_sel",
+      "type": "PS",
+      "cycles": 1,
+      "line": 185,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 23
+      }
+    },
+    {
+      "id": 78,
+      "table": "s_table4_2",
+      "opcode": 24,
+      "name": "ps_res",
+      "type": "PS",
+      "cycles": 1,
+      "line": 188,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 24
+      }
+    },
+    {
+      "id": 79,
+      "table": "s_table4_2",
+      "opcode": 25,
+      "name": "ps_mul",
+      "type": "PS",
+      "cycles": 1,
+      "line": 191,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 25
+      }
+    },
+    {
+      "id": 80,
+      "table": "s_table4_2",
+      "opcode": 26,
+      "name": "ps_rsqrte",
+      "type": "PS",
+      "cycles": 2,
+      "line": 194,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 26
+      }
+    },
+    {
+      "id": 81,
+      "table": "s_table4_2",
+      "opcode": 28,
+      "name": "ps_msub",
+      "type": "PS",
+      "cycles": 1,
+      "line": 197,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 28
+      }
+    },
+    {
+      "id": 82,
+      "table": "s_table4_2",
+      "opcode": 29,
+      "name": "ps_madd",
+      "type": "PS",
+      "cycles": 1,
+      "line": 200,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 29
+      }
+    },
+    {
+      "id": 83,
+      "table": "s_table4_2",
+      "opcode": 30,
+      "name": "ps_nmsub",
+      "type": "PS",
+      "cycles": 1,
+      "line": 203,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 30
+      }
+    },
+    {
+      "id": 84,
+      "table": "s_table4_2",
+      "opcode": 31,
+      "name": "ps_nmadd",
+      "type": "PS",
+      "cycles": 1,
+      "line": 206,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 5,
+        "subopcode": 31
+      }
+    },
+    {
+      "id": 85,
+      "table": "s_table4_3",
+      "opcode": 6,
+      "name": "psq_lx",
+      "type": "LoadPS",
+      "cycles": 1,
+      "line": 212,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 6,
+        "subopcode": 6
+      }
+    },
+    {
+      "id": 86,
+      "table": "s_table4_3",
+      "opcode": 7,
+      "name": "psq_stx",
+      "type": "StorePS",
+      "cycles": 1,
+      "line": 213,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 6,
+        "subopcode": 7
+      }
+    },
+    {
+      "id": 87,
+      "table": "s_table4_3",
+      "opcode": 38,
+      "name": "psq_lux",
+      "type": "LoadPS",
+      "cycles": 1,
+      "line": 214,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 6,
+        "subopcode": 38
+      }
+    },
+    {
+      "id": 88,
+      "table": "s_table4_3",
+      "opcode": 39,
+      "name": "psq_stux",
+      "type": "StorePS",
+      "cycles": 1,
+      "line": 216,
+      "selector": {
+        "primary": 4,
+        "subopcode_bits": 6,
+        "subopcode": 39
+      }
+    },
+    {
+      "id": 89,
+      "table": "s_table19",
+      "opcode": 528,
+      "name": "bcctrx",
+      "type": "Branch",
+      "cycles": 1,
+      "line": 221,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 528
+      }
+    },
+    {
+      "id": 90,
+      "table": "s_table19",
+      "opcode": 16,
+      "name": "bclrx",
+      "type": "Branch",
+      "cycles": 1,
+      "line": 222,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 16
+      }
+    },
+    {
+      "id": 91,
+      "table": "s_table19",
+      "opcode": 257,
+      "name": "crand",
+      "type": "CR",
+      "cycles": 1,
+      "line": 223,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 257
+      }
+    },
+    {
+      "id": 92,
+      "table": "s_table19",
+      "opcode": 129,
+      "name": "crandc",
+      "type": "CR",
+      "cycles": 1,
+      "line": 224,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 129
+      }
+    },
+    {
+      "id": 93,
+      "table": "s_table19",
+      "opcode": 289,
+      "name": "creqv",
+      "type": "CR",
+      "cycles": 1,
+      "line": 225,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 289
+      }
+    },
+    {
+      "id": 94,
+      "table": "s_table19",
+      "opcode": 225,
+      "name": "crnand",
+      "type": "CR",
+      "cycles": 1,
+      "line": 226,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 225
+      }
+    },
+    {
+      "id": 95,
+      "table": "s_table19",
+      "opcode": 33,
+      "name": "crnor",
+      "type": "CR",
+      "cycles": 1,
+      "line": 227,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 33
+      }
+    },
+    {
+      "id": 96,
+      "table": "s_table19",
+      "opcode": 449,
+      "name": "cror",
+      "type": "CR",
+      "cycles": 1,
+      "line": 228,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 449
+      }
+    },
+    {
+      "id": 97,
+      "table": "s_table19",
+      "opcode": 417,
+      "name": "crorc",
+      "type": "CR",
+      "cycles": 1,
+      "line": 229,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 417
+      }
+    },
+    {
+      "id": 98,
+      "table": "s_table19",
+      "opcode": 193,
+      "name": "crxor",
+      "type": "CR",
+      "cycles": 1,
+      "line": 230,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 193
+      }
+    },
+    {
+      "id": 99,
+      "table": "s_table19",
+      "opcode": 150,
+      "name": "isync",
+      "type": "InstructionCache",
+      "cycles": 1,
+      "line": 232,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 150
+      }
+    },
+    {
+      "id": 100,
+      "table": "s_table19",
+      "opcode": 0,
+      "name": "mcrf",
+      "type": "System",
+      "cycles": 1,
+      "line": 233,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 0
+      }
+    },
+    {
+      "id": 101,
+      "table": "s_table19",
+      "opcode": 50,
+      "name": "rfi",
+      "type": "System",
+      "cycles": 2,
+      "line": 235,
+      "selector": {
+        "primary": 19,
+        "subopcode_bits": 10,
+        "subopcode": 50
+      }
+    },
+    {
+      "id": 102,
+      "table": "s_table31",
+      "opcode": 266,
+      "name": "addx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 240,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 266
+      }
+    },
+    {
+      "id": 103,
+      "table": "s_table31",
+      "opcode": 778,
+      "name": "addox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 241,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 778
+      }
+    },
+    {
+      "id": 104,
+      "table": "s_table31",
+      "opcode": 10,
+      "name": "addcx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 242,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 10
+      }
+    },
+    {
+      "id": 105,
+      "table": "s_table31",
+      "opcode": 522,
+      "name": "addcox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 243,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 522
+      }
+    },
+    {
+      "id": 106,
+      "table": "s_table31",
+      "opcode": 138,
+      "name": "addex",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 244,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 138
+      }
+    },
+    {
+      "id": 107,
+      "table": "s_table31",
+      "opcode": 650,
+      "name": "addeox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 245,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 650
+      }
+    },
+    {
+      "id": 108,
+      "table": "s_table31",
+      "opcode": 234,
+      "name": "addmex",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 247,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 234
+      }
+    },
+    {
+      "id": 109,
+      "table": "s_table31",
+      "opcode": 746,
+      "name": "addmeox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 248,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 746
+      }
+    },
+    {
+      "id": 110,
+      "table": "s_table31",
+      "opcode": 202,
+      "name": "addzex",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 250,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 202
+      }
+    },
+    {
+      "id": 111,
+      "table": "s_table31",
+      "opcode": 714,
+      "name": "addzeox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 251,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 714
+      }
+    },
+    {
+      "id": 112,
+      "table": "s_table31",
+      "opcode": 491,
+      "name": "divwx",
+      "type": "Integer",
+      "cycles": 40,
+      "line": 253,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 491
+      }
+    },
+    {
+      "id": 113,
+      "table": "s_table31",
+      "opcode": 1003,
+      "name": "divwox",
+      "type": "Integer",
+      "cycles": 40,
+      "line": 254,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 1003
+      }
+    },
+    {
+      "id": 114,
+      "table": "s_table31",
+      "opcode": 459,
+      "name": "divwux",
+      "type": "Integer",
+      "cycles": 40,
+      "line": 255,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 459
+      }
+    },
+    {
+      "id": 115,
+      "table": "s_table31",
+      "opcode": 971,
+      "name": "divwuox",
+      "type": "Integer",
+      "cycles": 40,
+      "line": 256,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 971
+      }
+    },
+    {
+      "id": 116,
+      "table": "s_table31",
+      "opcode": 75,
+      "name": "mulhwx",
+      "type": "Integer",
+      "cycles": 5,
+      "line": 257,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 75
+      }
+    },
+    {
+      "id": 117,
+      "table": "s_table31",
+      "opcode": 11,
+      "name": "mulhwux",
+      "type": "Integer",
+      "cycles": 5,
+      "line": 258,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 11
+      }
+    },
+    {
+      "id": 118,
+      "table": "s_table31",
+      "opcode": 235,
+      "name": "mullwx",
+      "type": "Integer",
+      "cycles": 5,
+      "line": 259,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 235
+      }
+    },
+    {
+      "id": 119,
+      "table": "s_table31",
+      "opcode": 747,
+      "name": "mullwox",
+      "type": "Integer",
+      "cycles": 5,
+      "line": 260,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 747
+      }
+    },
+    {
+      "id": 120,
+      "table": "s_table31",
+      "opcode": 104,
+      "name": "negx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 261,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 104
+      }
+    },
+    {
+      "id": 121,
+      "table": "s_table31",
+      "opcode": 616,
+      "name": "negox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 262,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 616
+      }
+    },
+    {
+      "id": 122,
+      "table": "s_table31",
+      "opcode": 40,
+      "name": "subfx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 263,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 40
+      }
+    },
+    {
+      "id": 123,
+      "table": "s_table31",
+      "opcode": 552,
+      "name": "subfox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 264,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 552
+      }
+    },
+    {
+      "id": 124,
+      "table": "s_table31",
+      "opcode": 8,
+      "name": "subfcx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 265,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 8
+      }
+    },
+    {
+      "id": 125,
+      "table": "s_table31",
+      "opcode": 520,
+      "name": "subfcox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 266,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 520
+      }
+    },
+    {
+      "id": 126,
+      "table": "s_table31",
+      "opcode": 136,
+      "name": "subfex",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 267,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 136
+      }
+    },
+    {
+      "id": 127,
+      "table": "s_table31",
+      "opcode": 648,
+      "name": "subfeox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 268,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 648
+      }
+    },
+    {
+      "id": 128,
+      "table": "s_table31",
+      "opcode": 232,
+      "name": "subfmex",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 270,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 232
+      }
+    },
+    {
+      "id": 129,
+      "table": "s_table31",
+      "opcode": 744,
+      "name": "subfmeox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 271,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 744
+      }
+    },
+    {
+      "id": 130,
+      "table": "s_table31",
+      "opcode": 200,
+      "name": "subfzex",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 273,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 200
+      }
+    },
+    {
+      "id": 131,
+      "table": "s_table31",
+      "opcode": 712,
+      "name": "subfzeox",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 274,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 712
+      }
+    },
+    {
+      "id": 132,
+      "table": "s_table31",
+      "opcode": 28,
+      "name": "andx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 277,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 28
+      }
+    },
+    {
+      "id": 133,
+      "table": "s_table31",
+      "opcode": 60,
+      "name": "andcx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 278,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 60
+      }
+    },
+    {
+      "id": 134,
+      "table": "s_table31",
+      "opcode": 444,
+      "name": "orx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 279,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 444
+      }
+    },
+    {
+      "id": 135,
+      "table": "s_table31",
+      "opcode": 124,
+      "name": "norx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 280,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 124
+      }
+    },
+    {
+      "id": 136,
+      "table": "s_table31",
+      "opcode": 316,
+      "name": "xorx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 281,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 316
+      }
+    },
+    {
+      "id": 137,
+      "table": "s_table31",
+      "opcode": 412,
+      "name": "orcx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 282,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 412
+      }
+    },
+    {
+      "id": 138,
+      "table": "s_table31",
+      "opcode": 476,
+      "name": "nandx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 283,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 476
+      }
+    },
+    {
+      "id": 139,
+      "table": "s_table31",
+      "opcode": 284,
+      "name": "eqvx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 284,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 284
+      }
+    },
+    {
+      "id": 140,
+      "table": "s_table31",
+      "opcode": 0,
+      "name": "cmp",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 285,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 0
+      }
+    },
+    {
+      "id": 141,
+      "table": "s_table31",
+      "opcode": 32,
+      "name": "cmpl",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 286,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 32
+      }
+    },
+    {
+      "id": 142,
+      "table": "s_table31",
+      "opcode": 26,
+      "name": "cntlzwx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 287,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 26
+      }
+    },
+    {
+      "id": 143,
+      "table": "s_table31",
+      "opcode": 922,
+      "name": "extshx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 288,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 922
+      }
+    },
+    {
+      "id": 144,
+      "table": "s_table31",
+      "opcode": 954,
+      "name": "extsbx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 289,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 954
+      }
+    },
+    {
+      "id": 145,
+      "table": "s_table31",
+      "opcode": 536,
+      "name": "srwx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 290,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 536
+      }
+    },
+    {
+      "id": 146,
+      "table": "s_table31",
+      "opcode": 792,
+      "name": "srawx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 291,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 792
+      }
+    },
+    {
+      "id": 147,
+      "table": "s_table31",
+      "opcode": 824,
+      "name": "srawix",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 292,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 824
+      }
+    },
+    {
+      "id": 148,
+      "table": "s_table31",
+      "opcode": 24,
+      "name": "slwx",
+      "type": "Integer",
+      "cycles": 1,
+      "line": 293,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 24
+      }
+    },
+    {
+      "id": 149,
+      "table": "s_table31",
+      "opcode": 54,
+      "name": "dcbst",
+      "type": "DataCache",
+      "cycles": 5,
+      "line": 295,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 54
+      }
+    },
+    {
+      "id": 150,
+      "table": "s_table31",
+      "opcode": 86,
+      "name": "dcbf",
+      "type": "DataCache",
+      "cycles": 5,
+      "line": 296,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 86
+      }
+    },
+    {
+      "id": 151,
+      "table": "s_table31",
+      "opcode": 246,
+      "name": "dcbtst",
+      "type": "DataCache",
+      "cycles": 2,
+      "line": 297,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 246
+      }
+    },
+    {
+      "id": 152,
+      "table": "s_table31",
+      "opcode": 278,
+      "name": "dcbt",
+      "type": "DataCache",
+      "cycles": 2,
+      "line": 298,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 278
+      }
+    },
+    {
+      "id": 153,
+      "table": "s_table31",
+      "opcode": 470,
+      "name": "dcbi",
+      "type": "DataCache",
+      "cycles": 5,
+      "line": 299,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 470
+      }
+    },
+    {
+      "id": 154,
+      "table": "s_table31",
+      "opcode": 758,
+      "name": "dcba",
+      "type": "DataCache",
+      "cycles": 5,
+      "line": 300,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 758
+      }
+    },
+    {
+      "id": 155,
+      "table": "s_table31",
+      "opcode": 1014,
+      "name": "dcbz",
+      "type": "DataCache",
+      "cycles": 5,
+      "line": 301,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 1014
+      }
+    },
+    {
+      "id": 156,
+      "table": "s_table31",
+      "opcode": 23,
+      "name": "lwzx",
+      "type": "Load",
+      "cycles": 1,
+      "line": 304,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 23
+      }
+    },
+    {
+      "id": 157,
+      "table": "s_table31",
+      "opcode": 55,
+      "name": "lwzux",
+      "type": "Load",
+      "cycles": 1,
+      "line": 305,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 55
+      }
+    },
+    {
+      "id": 158,
+      "table": "s_table31",
+      "opcode": 279,
+      "name": "lhzx",
+      "type": "Load",
+      "cycles": 1,
+      "line": 308,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 279
+      }
+    },
+    {
+      "id": 159,
+      "table": "s_table31",
+      "opcode": 311,
+      "name": "lhzux",
+      "type": "Load",
+      "cycles": 1,
+      "line": 309,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 311
+      }
+    },
+    {
+      "id": 160,
+      "table": "s_table31",
+      "opcode": 343,
+      "name": "lhax",
+      "type": "Load",
+      "cycles": 1,
+      "line": 312,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 343
+      }
+    },
+    {
+      "id": 161,
+      "table": "s_table31",
+      "opcode": 375,
+      "name": "lhaux",
+      "type": "Load",
+      "cycles": 1,
+      "line": 313,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 375
+      }
+    },
+    {
+      "id": 162,
+      "table": "s_table31",
+      "opcode": 87,
+      "name": "lbzx",
+      "type": "Load",
+      "cycles": 1,
+      "line": 316,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 87
+      }
+    },
+    {
+      "id": 163,
+      "table": "s_table31",
+      "opcode": 119,
+      "name": "lbzux",
+      "type": "Load",
+      "cycles": 1,
+      "line": 317,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 119
+      }
+    },
+    {
+      "id": 164,
+      "table": "s_table31",
+      "opcode": 534,
+      "name": "lwbrx",
+      "type": "Load",
+      "cycles": 1,
+      "line": 320,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 534
+      }
+    },
+    {
+      "id": 165,
+      "table": "s_table31",
+      "opcode": 790,
+      "name": "lhbrx",
+      "type": "Load",
+      "cycles": 1,
+      "line": 321,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 790
+      }
+    },
+    {
+      "id": 166,
+      "table": "s_table31",
+      "opcode": 150,
+      "name": "stwcxd",
+      "type": "Store",
+      "cycles": 1,
+      "line": 324,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 150
+      }
+    },
+    {
+      "id": 167,
+      "table": "s_table31",
+      "opcode": 20,
+      "name": "lwarx",
+      "type": "Load",
+      "cycles": 1,
+      "line": 325,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 20
+      }
+    },
+    {
+      "id": 168,
+      "table": "s_table31",
+      "opcode": 533,
+      "name": "lswx",
+      "type": "Load",
+      "cycles": 1,
+      "line": 328,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 533
+      }
+    },
+    {
+      "id": 169,
+      "table": "s_table31",
+      "opcode": 597,
+      "name": "lswi",
+      "type": "Load",
+      "cycles": 1,
+      "line": 329,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 597
+      }
+    },
+    {
+      "id": 170,
+      "table": "s_table31",
+      "opcode": 151,
+      "name": "stwx",
+      "type": "Store",
+      "cycles": 1,
+      "line": 332,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 151
+      }
+    },
+    {
+      "id": 171,
+      "table": "s_table31",
+      "opcode": 183,
+      "name": "stwux",
+      "type": "Store",
+      "cycles": 1,
+      "line": 333,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 183
+      }
+    },
+    {
+      "id": 172,
+      "table": "s_table31",
+      "opcode": 407,
+      "name": "sthx",
+      "type": "Store",
+      "cycles": 1,
+      "line": 336,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 407
+      }
+    },
+    {
+      "id": 173,
+      "table": "s_table31",
+      "opcode": 439,
+      "name": "sthux",
+      "type": "Store",
+      "cycles": 1,
+      "line": 337,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 439
+      }
+    },
+    {
+      "id": 174,
+      "table": "s_table31",
+      "opcode": 215,
+      "name": "stbx",
+      "type": "Store",
+      "cycles": 1,
+      "line": 340,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 215
+      }
+    },
+    {
+      "id": 175,
+      "table": "s_table31",
+      "opcode": 247,
+      "name": "stbux",
+      "type": "Store",
+      "cycles": 1,
+      "line": 341,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 247
+      }
+    },
+    {
+      "id": 176,
+      "table": "s_table31",
+      "opcode": 662,
+      "name": "stwbrx",
+      "type": "Store",
+      "cycles": 1,
+      "line": 344,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 662
+      }
+    },
+    {
+      "id": 177,
+      "table": "s_table31",
+      "opcode": 918,
+      "name": "sthbrx",
+      "type": "Store",
+      "cycles": 1,
+      "line": 345,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 918
+      }
+    },
+    {
+      "id": 178,
+      "table": "s_table31",
+      "opcode": 661,
+      "name": "stswx",
+      "type": "Store",
+      "cycles": 1,
+      "line": 347,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 661
+      }
+    },
+    {
+      "id": 179,
+      "table": "s_table31",
+      "opcode": 725,
+      "name": "stswi",
+      "type": "Store",
+      "cycles": 1,
+      "line": 348,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 725
+      }
+    },
+    {
+      "id": 180,
+      "table": "s_table31",
+      "opcode": 535,
+      "name": "lfsx",
+      "type": "LoadFP",
+      "cycles": 1,
+      "line": 351,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 535
+      }
+    },
+    {
+      "id": 181,
+      "table": "s_table31",
+      "opcode": 567,
+      "name": "lfsux",
+      "type": "LoadFP",
+      "cycles": 1,
+      "line": 352,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 567
+      }
+    },
+    {
+      "id": 182,
+      "table": "s_table31",
+      "opcode": 599,
+      "name": "lfdx",
+      "type": "LoadFP",
+      "cycles": 1,
+      "line": 354,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 599
+      }
+    },
+    {
+      "id": 183,
+      "table": "s_table31",
+      "opcode": 631,
+      "name": "lfdux",
+      "type": "LoadFP",
+      "cycles": 1,
+      "line": 355,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 631
+      }
+    },
+    {
+      "id": 184,
+      "table": "s_table31",
+      "opcode": 663,
+      "name": "stfsx",
+      "type": "StoreFP",
+      "cycles": 1,
+      "line": 358,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 663
+      }
+    },
+    {
+      "id": 185,
+      "table": "s_table31",
+      "opcode": 695,
+      "name": "stfsux",
+      "type": "StoreFP",
+      "cycles": 1,
+      "line": 359,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 695
+      }
+    },
+    {
+      "id": 186,
+      "table": "s_table31",
+      "opcode": 727,
+      "name": "stfdx",
+      "type": "StoreFP",
+      "cycles": 1,
+      "line": 361,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 727
+      }
+    },
+    {
+      "id": 187,
+      "table": "s_table31",
+      "opcode": 759,
+      "name": "stfdux",
+      "type": "StoreFP",
+      "cycles": 1,
+      "line": 362,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 759
+      }
+    },
+    {
+      "id": 188,
+      "table": "s_table31",
+      "opcode": 983,
+      "name": "stfiwx",
+      "type": "StoreFP",
+      "cycles": 1,
+      "line": 364,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 983
+      }
+    },
+    {
+      "id": 189,
+      "table": "s_table31",
+      "opcode": 19,
+      "name": "mfcr",
+      "type": "System",
+      "cycles": 1,
+      "line": 366,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 19
+      }
+    },
+    {
+      "id": 190,
+      "table": "s_table31",
+      "opcode": 83,
+      "name": "mfmsr",
+      "type": "System",
+      "cycles": 1,
+      "line": 367,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 83
+      }
+    },
+    {
+      "id": 191,
+      "table": "s_table31",
+      "opcode": 144,
+      "name": "mtcrf",
+      "type": "System",
+      "cycles": 1,
+      "line": 368,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 144
+      }
+    },
+    {
+      "id": 192,
+      "table": "s_table31",
+      "opcode": 146,
+      "name": "mtmsr",
+      "type": "System",
+      "cycles": 1,
+      "line": 369,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 146
+      }
+    },
+    {
+      "id": 193,
+      "table": "s_table31",
+      "opcode": 210,
+      "name": "mtsr",
+      "type": "System",
+      "cycles": 1,
+      "line": 371,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 210
+      }
+    },
+    {
+      "id": 194,
+      "table": "s_table31",
+      "opcode": 242,
+      "name": "mtsrin",
+      "type": "System",
+      "cycles": 1,
+      "line": 372,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 242
+      }
+    },
+    {
+      "id": 195,
+      "table": "s_table31",
+      "opcode": 339,
+      "name": "mfspr",
+      "type": "SPR",
+      "cycles": 1,
+      "line": 373,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 339
+      }
+    },
+    {
+      "id": 196,
+      "table": "s_table31",
+      "opcode": 467,
+      "name": "mtspr",
+      "type": "SPR",
+      "cycles": 2,
+      "line": 374,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 467
+      }
+    },
+    {
+      "id": 197,
+      "table": "s_table31",
+      "opcode": 371,
+      "name": "mftb",
+      "type": "System",
+      "cycles": 1,
+      "line": 375,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 371
+      }
+    },
+    {
+      "id": 198,
+      "table": "s_table31",
+      "opcode": 512,
+      "name": "mcrxr",
+      "type": "System",
+      "cycles": 1,
+      "line": 376,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 512
+      }
+    },
+    {
+      "id": 199,
+      "table": "s_table31",
+      "opcode": 595,
+      "name": "mfsr",
+      "type": "System",
+      "cycles": 3,
+      "line": 377,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 595
+      }
+    },
+    {
+      "id": 200,
+      "table": "s_table31",
+      "opcode": 659,
+      "name": "mfsrin",
+      "type": "System",
+      "cycles": 3,
+      "line": 378,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 659
+      }
+    },
+    {
+      "id": 201,
+      "table": "s_table31",
+      "opcode": 4,
+      "name": "tw",
+      "type": "System",
+      "cycles": 2,
+      "line": 380,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 4
+      }
+    },
+    {
+      "id": 202,
+      "table": "s_table31",
+      "opcode": 598,
+      "name": "sync",
+      "type": "System",
+      "cycles": 3,
+      "line": 381,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 598
+      }
+    },
+    {
+      "id": 203,
+      "table": "s_table31",
+      "opcode": 982,
+      "name": "icbi",
+      "type": "System",
+      "cycles": 4,
+      "line": 382,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 982
+      }
+    },
+    {
+      "id": 204,
+      "table": "s_table31",
+      "opcode": 310,
+      "name": "eciwx",
+      "type": "System",
+      "cycles": 1,
+      "line": 385,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 310
+      }
+    },
+    {
+      "id": 205,
+      "table": "s_table31",
+      "opcode": 438,
+      "name": "ecowx",
+      "type": "System",
+      "cycles": 1,
+      "line": 386,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 438
+      }
+    },
+    {
+      "id": 206,
+      "table": "s_table31",
+      "opcode": 854,
+      "name": "eieio",
+      "type": "System",
+      "cycles": 1,
+      "line": 387,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 854
+      }
+    },
+    {
+      "id": 207,
+      "table": "s_table31",
+      "opcode": 306,
+      "name": "tlbie",
+      "type": "System",
+      "cycles": 1,
+      "line": 388,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 306
+      }
+    },
+    {
+      "id": 208,
+      "table": "s_table31",
+      "opcode": 566,
+      "name": "tlbsync",
+      "type": "System",
+      "cycles": 1,
+      "line": 389,
+      "selector": {
+        "primary": 31,
+        "subopcode_bits": 10,
+        "subopcode": 566
+      }
+    },
+    {
+      "id": 209,
+      "table": "s_table59",
+      "opcode": 18,
+      "name": "fdivsx",
+      "type": "SingleFP",
+      "cycles": 17,
+      "line": 393,
+      "selector": {
+        "primary": 59,
+        "subopcode_bits": 5,
+        "subopcode": 18
+      }
+    },
+    {
+      "id": 210,
+      "table": "s_table59",
+      "opcode": 20,
+      "name": "fsubsx",
+      "type": "SingleFP",
+      "cycles": 1,
+      "line": 396,
+      "selector": {
+        "primary": 59,
+        "subopcode_bits": 5,
+        "subopcode": 20
+      }
+    },
+    {
+      "id": 211,
+      "table": "s_table59",
+      "opcode": 21,
+      "name": "faddsx",
+      "type": "SingleFP",
+      "cycles": 1,
+      "line": 398,
+      "selector": {
+        "primary": 59,
+        "subopcode_bits": 5,
+        "subopcode": 21
+      }
+    },
+    {
+      "id": 212,
+      "table": "s_table59",
+      "opcode": 24,
+      "name": "fresx",
+      "type": "SingleFP",
+      "cycles": 1,
+      "line": 400,
+      "selector": {
+        "primary": 59,
+        "subopcode_bits": 5,
+        "subopcode": 24
+      }
+    },
+    {
+      "id": 213,
+      "table": "s_table59",
+      "opcode": 25,
+      "name": "fmulsx",
+      "type": "SingleFP",
+      "cycles": 1,
+      "line": 403,
+      "selector": {
+        "primary": 59,
+        "subopcode_bits": 5,
+        "subopcode": 25
+      }
+    },
+    {
+      "id": 214,
+      "table": "s_table59",
+      "opcode": 28,
+      "name": "fmsubsx",
+      "type": "SingleFP",
+      "cycles": 1,
+      "line": 405,
+      "selector": {
+        "primary": 59,
+        "subopcode_bits": 5,
+        "subopcode": 28
+      }
+    },
+    {
+      "id": 215,
+      "table": "s_table59",
+      "opcode": 29,
+      "name": "fmaddsx",
+      "type": "SingleFP",
+      "cycles": 1,
+      "line": 408,
+      "selector": {
+        "primary": 59,
+        "subopcode_bits": 5,
+        "subopcode": 29
+      }
+    },
+    {
+      "id": 216,
+      "table": "s_table59",
+      "opcode": 30,
+      "name": "fnmsubsx",
+      "type": "SingleFP",
+      "cycles": 1,
+      "line": 411,
+      "selector": {
+        "primary": 59,
+        "subopcode_bits": 5,
+        "subopcode": 30
+      }
+    },
+    {
+      "id": 217,
+      "table": "s_table59",
+      "opcode": 31,
+      "name": "fnmaddsx",
+      "type": "SingleFP",
+      "cycles": 1,
+      "line": 414,
+      "selector": {
+        "primary": 59,
+        "subopcode_bits": 5,
+        "subopcode": 31
+      }
+    },
+    {
+      "id": 218,
+      "table": "s_table63",
+      "opcode": 264,
+      "name": "fabsx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 420,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 264
+      }
+    },
+    {
+      "id": 219,
+      "table": "s_table63",
+      "opcode": 32,
+      "name": "fcmpo",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 427,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 32
+      }
+    },
+    {
+      "id": 220,
+      "table": "s_table63",
+      "opcode": 0,
+      "name": "fcmpu",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 429,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 0
+      }
+    },
+    {
+      "id": 221,
+      "table": "s_table63",
+      "opcode": 14,
+      "name": "fctiwx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 432,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 14
+      }
+    },
+    {
+      "id": 222,
+      "table": "s_table63",
+      "opcode": 15,
+      "name": "fctiwzx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 434,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 15
+      }
+    },
+    {
+      "id": 223,
+      "table": "s_table63",
+      "opcode": 72,
+      "name": "fmrx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 436,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 72
+      }
+    },
+    {
+      "id": 224,
+      "table": "s_table63",
+      "opcode": 136,
+      "name": "fnabsx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 438,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 136
+      }
+    },
+    {
+      "id": 225,
+      "table": "s_table63",
+      "opcode": 40,
+      "name": "fnegx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 440,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 40
+      }
+    },
+    {
+      "id": 226,
+      "table": "s_table63",
+      "opcode": 12,
+      "name": "frspx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 442,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 12
+      }
+    },
+    {
+      "id": 227,
+      "table": "s_table63",
+      "opcode": 64,
+      "name": "mcrfs",
+      "type": "SystemFP",
+      "cycles": 1,
+      "line": 445,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 64
+      }
+    },
+    {
+      "id": 228,
+      "table": "s_table63",
+      "opcode": 583,
+      "name": "mffsx",
+      "type": "SystemFP",
+      "cycles": 1,
+      "line": 446,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 583
+      }
+    },
+    {
+      "id": 229,
+      "table": "s_table63",
+      "opcode": 70,
+      "name": "mtfsb0x",
+      "type": "SystemFP",
+      "cycles": 3,
+      "line": 447,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 70
+      }
+    },
+    {
+      "id": 230,
+      "table": "s_table63",
+      "opcode": 38,
+      "name": "mtfsb1x",
+      "type": "SystemFP",
+      "cycles": 3,
+      "line": 448,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 38
+      }
+    },
+    {
+      "id": 231,
+      "table": "s_table63",
+      "opcode": 134,
+      "name": "mtfsfix",
+      "type": "SystemFP",
+      "cycles": 3,
+      "line": 450,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 134
+      }
+    },
+    {
+      "id": 232,
+      "table": "s_table63",
+      "opcode": 711,
+      "name": "mtfsfx",
+      "type": "SystemFP",
+      "cycles": 3,
+      "line": 452,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 10,
+        "subopcode": 711
+      }
+    },
+    {
+      "id": 233,
+      "table": "s_table63_2",
+      "opcode": 18,
+      "name": "fdivx",
+      "type": "DoubleFP",
+      "cycles": 31,
+      "line": 457,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 5,
+        "subopcode": 18
+      }
+    },
+    {
+      "id": 234,
+      "table": "s_table63_2",
+      "opcode": 20,
+      "name": "fsubx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 460,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 5,
+        "subopcode": 20
+      }
+    },
+    {
+      "id": 235,
+      "table": "s_table63_2",
+      "opcode": 21,
+      "name": "faddx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 463,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 5,
+        "subopcode": 21
+      }
+    },
+    {
+      "id": 236,
+      "table": "s_table63_2",
+      "opcode": 23,
+      "name": "fselx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 466,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 5,
+        "subopcode": 23
+      }
+    },
+    {
+      "id": 237,
+      "table": "s_table63_2",
+      "opcode": 25,
+      "name": "fmulx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 468,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 5,
+        "subopcode": 25
+      }
+    },
+    {
+      "id": 238,
+      "table": "s_table63_2",
+      "opcode": 26,
+      "name": "frsqrtex",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 471,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 5,
+        "subopcode": 26
+      }
+    },
+    {
+      "id": 239,
+      "table": "s_table63_2",
+      "opcode": 28,
+      "name": "fmsubx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 474,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 5,
+        "subopcode": 28
+      }
+    },
+    {
+      "id": 240,
+      "table": "s_table63_2",
+      "opcode": 29,
+      "name": "fmaddx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 477,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 5,
+        "subopcode": 29
+      }
+    },
+    {
+      "id": 241,
+      "table": "s_table63_2",
+      "opcode": 30,
+      "name": "fnmsubx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 480,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 5,
+        "subopcode": 30
+      }
+    },
+    {
+      "id": 242,
+      "table": "s_table63_2",
+      "opcode": 31,
+      "name": "fnmaddx",
+      "type": "DoubleFP",
+      "cycles": 1,
+      "line": 483,
+      "selector": {
+        "primary": 63,
+        "subopcode_bits": 5,
+        "subopcode": 31
+      }
+    }
+  ],
+  "opcodes": [
+    {
+      "opcode": 0,
+      "enum": "PPC_OP_UNKNOWN",
+      "valid": false,
+      "modeled_units": null,
+      "synthetic_case_count": 4876416,
+      "representative_raw": "0x00000000",
+      "reference_ids": [
+        0,
+        9,
+        12,
+        13,
+        28,
+        30,
+        32,
+        34,
+        36,
+        38,
+        40,
+        44,
+        46,
+        48,
+        50,
+        52,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        67,
+        74,
+        75,
+        76,
+        78,
+        80,
+        85,
+        86,
+        87,
+        88,
+        89,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        108,
+        109,
+        110,
+        111,
+        120,
+        121,
+        128,
+        129,
+        130,
+        131,
+        140,
+        141,
+        149,
+        150,
+        151,
+        152,
+        153,
+        154,
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        174,
+        175,
+        176,
+        177,
+        178,
+        179,
+        180,
+        181,
+        182,
+        183,
+        184,
+        185,
+        186,
+        187,
+        188,
+        189,
+        190,
+        191,
+        192,
+        193,
+        194,
+        195,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        212,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        238
+      ]
+    },
+    {
+      "opcode": 1,
+      "enum": "PPC_OP_MULLI",
+      "valid": true,
+      "modeled_units": 3,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x1c000000",
+      "reference_ids": [
+        10
+      ]
+    },
+    {
+      "opcode": 2,
+      "enum": "PPC_OP_SUBFIC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x20000000",
+      "reference_ids": [
+        11
+      ]
+    },
+    {
+      "opcode": 3,
+      "enum": "PPC_OP_ADDI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x38000000",
+      "reference_ids": [
+        16
+      ]
+    },
+    {
+      "opcode": 4,
+      "enum": "PPC_OP_ADDIC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x30000000",
+      "reference_ids": [
+        14
+      ]
+    },
+    {
+      "opcode": 5,
+      "enum": "PPC_OP_ADDIC_DOT",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x34000000",
+      "reference_ids": [
+        15
+      ]
+    },
+    {
+      "opcode": 6,
+      "enum": "PPC_OP_ADDIS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x3c000000",
+      "reference_ids": [
+        17
+      ]
+    },
+    {
+      "opcode": 7,
+      "enum": "PPC_OP_CMPI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 153600,
+      "representative_raw": "0x2c000000",
+      "reference_ids": [
+        13
+      ]
+    },
+    {
+      "opcode": 8,
+      "enum": "PPC_OP_CMPLI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 153600,
+      "representative_raw": "0x28000000",
+      "reference_ids": [
+        12
+      ]
+    },
+    {
+      "opcode": 9,
+      "enum": "PPC_OP_ORI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x60000000",
+      "reference_ids": [
+        21
+      ]
+    },
+    {
+      "opcode": 10,
+      "enum": "PPC_OP_ORIS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x64000000",
+      "reference_ids": [
+        22
+      ]
+    },
+    {
+      "opcode": 11,
+      "enum": "PPC_OP_XORI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x68000000",
+      "reference_ids": [
+        23
+      ]
+    },
+    {
+      "opcode": 12,
+      "enum": "PPC_OP_XORIS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x6c000000",
+      "reference_ids": [
+        24
+      ]
+    },
+    {
+      "opcode": 13,
+      "enum": "PPC_OP_ANDI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x70000000",
+      "reference_ids": [
+        25
+      ]
+    },
+    {
+      "opcode": 14,
+      "enum": "PPC_OP_ANDIS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x74000000",
+      "reference_ids": [
+        26
+      ]
+    },
+    {
+      "opcode": 15,
+      "enum": "PPC_OP_LWZ",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x80000000",
+      "reference_ids": [
+        27
+      ]
+    },
+    {
+      "opcode": 16,
+      "enum": "PPC_OP_LWZU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 163840,
+      "representative_raw": "0x84010000",
+      "reference_ids": [
+        28
+      ]
+    },
+    {
+      "opcode": 17,
+      "enum": "PPC_OP_LBZ",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x88000000",
+      "reference_ids": [
+        29
+      ]
+    },
+    {
+      "opcode": 18,
+      "enum": "PPC_OP_LBZU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 163840,
+      "representative_raw": "0x8c010000",
+      "reference_ids": [
+        30
+      ]
+    },
+    {
+      "opcode": 19,
+      "enum": "PPC_OP_STW",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x90000000",
+      "reference_ids": [
+        37
+      ]
+    },
+    {
+      "opcode": 20,
+      "enum": "PPC_OP_STWU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 204800,
+      "representative_raw": "0x94010000",
+      "reference_ids": [
+        38
+      ]
+    },
+    {
+      "opcode": 21,
+      "enum": "PPC_OP_STB",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x98000000",
+      "reference_ids": [
+        39
+      ]
+    },
+    {
+      "opcode": 22,
+      "enum": "PPC_OP_STBU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 204800,
+      "representative_raw": "0x9c010000",
+      "reference_ids": [
+        40
+      ]
+    },
+    {
+      "opcode": 23,
+      "enum": "PPC_OP_LHZ",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0xa0000000",
+      "reference_ids": [
+        31
+      ]
+    },
+    {
+      "opcode": 24,
+      "enum": "PPC_OP_LHZU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 163840,
+      "representative_raw": "0xa4010000",
+      "reference_ids": [
+        32
+      ]
+    },
+    {
+      "opcode": 25,
+      "enum": "PPC_OP_LHA",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0xa8000000",
+      "reference_ids": [
+        33
+      ]
+    },
+    {
+      "opcode": 26,
+      "enum": "PPC_OP_LHAU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 163840,
+      "representative_raw": "0xac010000",
+      "reference_ids": [
+        34
+      ]
+    },
+    {
+      "opcode": 27,
+      "enum": "PPC_OP_STH",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0xb0000000",
+      "reference_ids": [
+        35
+      ]
+    },
+    {
+      "opcode": 28,
+      "enum": "PPC_OP_STHU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 204800,
+      "representative_raw": "0xb4010000",
+      "reference_ids": [
+        36
+      ]
+    },
+    {
+      "opcode": 29,
+      "enum": "PPC_OP_LMW",
+      "valid": true,
+      "modeled_units": 11,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0xb8000000",
+      "reference_ids": [
+        41
+      ]
+    },
+    {
+      "opcode": 30,
+      "enum": "PPC_OP_STMW",
+      "valid": true,
+      "modeled_units": 11,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0xbc000000",
+      "reference_ids": [
+        42
+      ]
+    },
+    {
+      "opcode": 31,
+      "enum": "PPC_OP_B",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x48000000",
+      "reference_ids": [
+        7
+      ]
+    },
+    {
+      "opcode": 32,
+      "enum": "PPC_OP_BC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 260096,
+      "representative_raw": "0x40000000",
+      "reference_ids": [
+        6
+      ]
+    },
+    {
+      "opcode": 33,
+      "enum": "PPC_OP_BCLR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 2298,
+      "representative_raw": "0x4c000020",
+      "reference_ids": [
+        90
+      ]
+    },
+    {
+      "opcode": 34,
+      "enum": "PPC_OP_BCCTR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 1124,
+      "representative_raw": "0x4c800420",
+      "reference_ids": [
+        89
+      ]
+    },
+    {
+      "opcode": 35,
+      "enum": "PPC_OP_SC",
+      "valid": true,
+      "modeled_units": 2,
+      "synthetic_case_count": 1,
+      "representative_raw": "0x44000002",
+      "reference_ids": [
+        9
+      ]
+    },
+    {
+      "opcode": 36,
+      "enum": "PPC_OP_RFI",
+      "valid": true,
+      "modeled_units": 2,
+      "synthetic_case_count": 1,
+      "representative_raw": "0x4c000064",
+      "reference_ids": [
+        101
+      ]
+    },
+    {
+      "opcode": 37,
+      "enum": "PPC_OP_CRAND",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x4c000202",
+      "reference_ids": [
+        91
+      ]
+    },
+    {
+      "opcode": 38,
+      "enum": "PPC_OP_CRANDC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x4c000102",
+      "reference_ids": [
+        92
+      ]
+    },
+    {
+      "opcode": 39,
+      "enum": "PPC_OP_CREQV",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x4c000242",
+      "reference_ids": [
+        93
+      ]
+    },
+    {
+      "opcode": 40,
+      "enum": "PPC_OP_CRNAND",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x4c0001c2",
+      "reference_ids": [
+        94
+      ]
+    },
+    {
+      "opcode": 41,
+      "enum": "PPC_OP_CRNOR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x4c000042",
+      "reference_ids": [
+        95
+      ]
+    },
+    {
+      "opcode": 42,
+      "enum": "PPC_OP_CROR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x4c000382",
+      "reference_ids": [
+        96
+      ]
+    },
+    {
+      "opcode": 43,
+      "enum": "PPC_OP_CRORC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x4c000342",
+      "reference_ids": [
+        97
+      ]
+    },
+    {
+      "opcode": 44,
+      "enum": "PPC_OP_CRXOR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x4c000182",
+      "reference_ids": [
+        98
+      ]
+    },
+    {
+      "opcode": 45,
+      "enum": "PPC_OP_MCRF",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 4,
+      "representative_raw": "0x4c000000",
+      "reference_ids": [
+        100
+      ]
+    },
+    {
+      "opcode": 46,
+      "enum": "PPC_OP_MFCR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 5,
+      "representative_raw": "0x7c000026",
+      "reference_ids": [
+        189
+      ]
+    },
+    {
+      "opcode": 47,
+      "enum": "PPC_OP_MTCRF",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 100,
+      "representative_raw": "0x7c000120",
+      "reference_ids": [
+        191
+      ]
+    },
+    {
+      "opcode": 48,
+      "enum": "PPC_OP_MFSPR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 1149,
+      "representative_raw": "0x7c0002a6",
+      "reference_ids": [
+        195
+      ]
+    },
+    {
+      "opcode": 49,
+      "enum": "PPC_OP_MTSPR",
+      "valid": true,
+      "modeled_units": 2,
+      "synthetic_case_count": 1149,
+      "representative_raw": "0x7c0003a6",
+      "reference_ids": [
+        196
+      ]
+    },
+    {
+      "opcode": 50,
+      "enum": "PPC_OP_MFTB",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 1149,
+      "representative_raw": "0x7c0002e6",
+      "reference_ids": [
+        197
+      ]
+    },
+    {
+      "opcode": 51,
+      "enum": "PPC_OP_CMP",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 150,
+      "representative_raw": "0x7c000000",
+      "reference_ids": [
+        140
+      ]
+    },
+    {
+      "opcode": 52,
+      "enum": "PPC_OP_CMPL",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 150,
+      "representative_raw": "0x7c000040",
+      "reference_ids": [
+        141
+      ]
+    },
+    {
+      "opcode": 53,
+      "enum": "PPC_OP_TWI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x0c000000",
+      "reference_ids": [
+        8
+      ]
+    },
+    {
+      "opcode": 54,
+      "enum": "PPC_OP_TW",
+      "valid": true,
+      "modeled_units": 2,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c000008",
+      "reference_ids": [
+        201
+      ]
+    },
+    {
+      "opcode": 55,
+      "enum": "PPC_OP_ADD",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000214",
+      "reference_ids": [
+        102
+      ]
+    },
+    {
+      "opcode": 56,
+      "enum": "PPC_OP_ADDO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000614",
+      "reference_ids": [
+        103
+      ]
+    },
+    {
+      "opcode": 57,
+      "enum": "PPC_OP_ADDC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000014",
+      "reference_ids": [
+        104
+      ]
+    },
+    {
+      "opcode": 58,
+      "enum": "PPC_OP_ADDCO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000414",
+      "reference_ids": [
+        105
+      ]
+    },
+    {
+      "opcode": 59,
+      "enum": "PPC_OP_ADDE",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000114",
+      "reference_ids": [
+        106
+      ]
+    },
+    {
+      "opcode": 60,
+      "enum": "PPC_OP_ADDEO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000514",
+      "reference_ids": [
+        107
+      ]
+    },
+    {
+      "opcode": 61,
+      "enum": "PPC_OP_ADDME",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x7c0001d4",
+      "reference_ids": [
+        108
+      ]
+    },
+    {
+      "opcode": 62,
+      "enum": "PPC_OP_ADDMEO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x7c0005d4",
+      "reference_ids": [
+        109
+      ]
+    },
+    {
+      "opcode": 63,
+      "enum": "PPC_OP_ADDZE",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x7c000194",
+      "reference_ids": [
+        110
+      ]
+    },
+    {
+      "opcode": 64,
+      "enum": "PPC_OP_ADDZEO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x7c000594",
+      "reference_ids": [
+        111
+      ]
+    },
+    {
+      "opcode": 65,
+      "enum": "PPC_OP_SUBF",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000050",
+      "reference_ids": [
+        122
+      ]
+    },
+    {
+      "opcode": 66,
+      "enum": "PPC_OP_SUBFO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000450",
+      "reference_ids": [
+        123
+      ]
+    },
+    {
+      "opcode": 67,
+      "enum": "PPC_OP_SUBFC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000010",
+      "reference_ids": [
+        124
+      ]
+    },
+    {
+      "opcode": 68,
+      "enum": "PPC_OP_SUBFCO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000410",
+      "reference_ids": [
+        125
+      ]
+    },
+    {
+      "opcode": 69,
+      "enum": "PPC_OP_SUBFE",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000110",
+      "reference_ids": [
+        126
+      ]
+    },
+    {
+      "opcode": 70,
+      "enum": "PPC_OP_SUBFEO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000510",
+      "reference_ids": [
+        127
+      ]
+    },
+    {
+      "opcode": 71,
+      "enum": "PPC_OP_SUBFME",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x7c0001d0",
+      "reference_ids": [
+        128
+      ]
+    },
+    {
+      "opcode": 72,
+      "enum": "PPC_OP_SUBFMEO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x7c0005d0",
+      "reference_ids": [
+        129
+      ]
+    },
+    {
+      "opcode": 73,
+      "enum": "PPC_OP_SUBFZE",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x7c000190",
+      "reference_ids": [
+        130
+      ]
+    },
+    {
+      "opcode": 74,
+      "enum": "PPC_OP_SUBFZEO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x7c000590",
+      "reference_ids": [
+        131
+      ]
+    },
+    {
+      "opcode": 75,
+      "enum": "PPC_OP_NEG",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x7c0000d0",
+      "reference_ids": [
+        120
+      ]
+    },
+    {
+      "opcode": 76,
+      "enum": "PPC_OP_NEGO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x7c0004d0",
+      "reference_ids": [
+        121
+      ]
+    },
+    {
+      "opcode": 77,
+      "enum": "PPC_OP_AND",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000038",
+      "reference_ids": [
+        132
+      ]
+    },
+    {
+      "opcode": 78,
+      "enum": "PPC_OP_ANDC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000078",
+      "reference_ids": [
+        133
+      ]
+    },
+    {
+      "opcode": 79,
+      "enum": "PPC_OP_OR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000378",
+      "reference_ids": [
+        134
+      ]
+    },
+    {
+      "opcode": 80,
+      "enum": "PPC_OP_ORC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000338",
+      "reference_ids": [
+        137
+      ]
+    },
+    {
+      "opcode": 81,
+      "enum": "PPC_OP_XOR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000278",
+      "reference_ids": [
+        136
+      ]
+    },
+    {
+      "opcode": 82,
+      "enum": "PPC_OP_NAND",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c0003b8",
+      "reference_ids": [
+        138
+      ]
+    },
+    {
+      "opcode": 83,
+      "enum": "PPC_OP_NOR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c0000f8",
+      "reference_ids": [
+        135
+      ]
+    },
+    {
+      "opcode": 84,
+      "enum": "PPC_OP_EQV",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000238",
+      "reference_ids": [
+        139
+      ]
+    },
+    {
+      "opcode": 85,
+      "enum": "PPC_OP_CNTLZW",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000034",
+      "reference_ids": [
+        142
+      ]
+    },
+    {
+      "opcode": 86,
+      "enum": "PPC_OP_EXTSB",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000774",
+      "reference_ids": [
+        144
+      ]
+    },
+    {
+      "opcode": 87,
+      "enum": "PPC_OP_EXTSH",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000734",
+      "reference_ids": [
+        143
+      ]
+    },
+    {
+      "opcode": 88,
+      "enum": "PPC_OP_SLW",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000030",
+      "reference_ids": [
+        148
+      ]
+    },
+    {
+      "opcode": 89,
+      "enum": "PPC_OP_SRW",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000430",
+      "reference_ids": [
+        145
+      ]
+    },
+    {
+      "opcode": 90,
+      "enum": "PPC_OP_SRAW",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000630",
+      "reference_ids": [
+        146
+      ]
+    },
+    {
+      "opcode": 91,
+      "enum": "PPC_OP_SRAWI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000670",
+      "reference_ids": [
+        147
+      ]
+    },
+    {
+      "opcode": 92,
+      "enum": "PPC_OP_RLWINM",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x54000000",
+      "reference_ids": [
+        19
+      ]
+    },
+    {
+      "opcode": 93,
+      "enum": "PPC_OP_RLWNM",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x5c000000",
+      "reference_ids": [
+        20
+      ]
+    },
+    {
+      "opcode": 94,
+      "enum": "PPC_OP_RLWIMI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0x50000000",
+      "reference_ids": [
+        18
+      ]
+    },
+    {
+      "opcode": 95,
+      "enum": "PPC_OP_LWZX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00002e",
+      "reference_ids": [
+        156
+      ]
+    },
+    {
+      "opcode": 96,
+      "enum": "PPC_OP_LWZUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 80,
+      "representative_raw": "0x7c01006e",
+      "reference_ids": [
+        157
+      ]
+    },
+    {
+      "opcode": 97,
+      "enum": "PPC_OP_LBZX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c0000ae",
+      "reference_ids": [
+        162
+      ]
+    },
+    {
+      "opcode": 98,
+      "enum": "PPC_OP_LBZUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 80,
+      "representative_raw": "0x7c0100ee",
+      "reference_ids": [
+        163
+      ]
+    },
+    {
+      "opcode": 99,
+      "enum": "PPC_OP_LHZX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00022e",
+      "reference_ids": [
+        158
+      ]
+    },
+    {
+      "opcode": 100,
+      "enum": "PPC_OP_LHZUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 80,
+      "representative_raw": "0x7c01026e",
+      "reference_ids": [
+        159
+      ]
+    },
+    {
+      "opcode": 101,
+      "enum": "PPC_OP_LHAX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c0002ae",
+      "reference_ids": [
+        160
+      ]
+    },
+    {
+      "opcode": 102,
+      "enum": "PPC_OP_LHAUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 80,
+      "representative_raw": "0x7c0102ee",
+      "reference_ids": [
+        161
+      ]
+    },
+    {
+      "opcode": 103,
+      "enum": "PPC_OP_LWBRX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00042c",
+      "reference_ids": [
+        164
+      ]
+    },
+    {
+      "opcode": 104,
+      "enum": "PPC_OP_LHBRX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00062c",
+      "reference_ids": [
+        165
+      ]
+    },
+    {
+      "opcode": 105,
+      "enum": "PPC_OP_STWX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00012e",
+      "reference_ids": [
+        170
+      ]
+    },
+    {
+      "opcode": 106,
+      "enum": "PPC_OP_STWUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 100,
+      "representative_raw": "0x7c01016e",
+      "reference_ids": [
+        171
+      ]
+    },
+    {
+      "opcode": 107,
+      "enum": "PPC_OP_STBX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c0001ae",
+      "reference_ids": [
+        174
+      ]
+    },
+    {
+      "opcode": 108,
+      "enum": "PPC_OP_STBUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 100,
+      "representative_raw": "0x7c0101ee",
+      "reference_ids": [
+        175
+      ]
+    },
+    {
+      "opcode": 109,
+      "enum": "PPC_OP_STHX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00032e",
+      "reference_ids": [
+        172
+      ]
+    },
+    {
+      "opcode": 110,
+      "enum": "PPC_OP_STHUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 100,
+      "representative_raw": "0x7c01036e",
+      "reference_ids": [
+        173
+      ]
+    },
+    {
+      "opcode": 111,
+      "enum": "PPC_OP_STWBRX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00052c",
+      "reference_ids": [
+        176
+      ]
+    },
+    {
+      "opcode": 112,
+      "enum": "PPC_OP_STHBRX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00072c",
+      "reference_ids": [
+        177
+      ]
+    },
+    {
+      "opcode": 113,
+      "enum": "PPC_OP_LSWI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 80,
+      "representative_raw": "0x7c010caa",
+      "reference_ids": [
+        169
+      ]
+    },
+    {
+      "opcode": 114,
+      "enum": "PPC_OP_LSWX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 80,
+      "representative_raw": "0x7c010c2a",
+      "reference_ids": [
+        168
+      ]
+    },
+    {
+      "opcode": 115,
+      "enum": "PPC_OP_STSWI",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c0005aa",
+      "reference_ids": [
+        179
+      ]
+    },
+    {
+      "opcode": 116,
+      "enum": "PPC_OP_STSWX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00052a",
+      "reference_ids": [
+        178
+      ]
+    },
+    {
+      "opcode": 117,
+      "enum": "PPC_OP_LWARX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c000028",
+      "reference_ids": [
+        167
+      ]
+    },
+    {
+      "opcode": 118,
+      "enum": "PPC_OP_STWCX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00012d",
+      "reference_ids": [
+        166
+      ]
+    },
+    {
+      "opcode": 119,
+      "enum": "PPC_OP_STFIWX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c0007ae",
+      "reference_ids": [
+        188
+      ]
+    },
+    {
+      "opcode": 120,
+      "enum": "PPC_OP_LFS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0xc0000000",
+      "reference_ids": [
+        43
+      ]
+    },
+    {
+      "opcode": 121,
+      "enum": "PPC_OP_LFSU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 204800,
+      "representative_raw": "0xc4010000",
+      "reference_ids": [
+        44
+      ]
+    },
+    {
+      "opcode": 122,
+      "enum": "PPC_OP_LFD",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0xc8000000",
+      "reference_ids": [
+        45
+      ]
+    },
+    {
+      "opcode": 123,
+      "enum": "PPC_OP_LFDU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 204800,
+      "representative_raw": "0xcc010000",
+      "reference_ids": [
+        46
+      ]
+    },
+    {
+      "opcode": 124,
+      "enum": "PPC_OP_STFS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0xd0000000",
+      "reference_ids": [
+        47
+      ]
+    },
+    {
+      "opcode": 125,
+      "enum": "PPC_OP_STFSU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 204800,
+      "representative_raw": "0xd4010000",
+      "reference_ids": [
+        48
+      ]
+    },
+    {
+      "opcode": 126,
+      "enum": "PPC_OP_STFD",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256000,
+      "representative_raw": "0xd8000000",
+      "reference_ids": [
+        49
+      ]
+    },
+    {
+      "opcode": 127,
+      "enum": "PPC_OP_STFDU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 204800,
+      "representative_raw": "0xdc010000",
+      "reference_ids": [
+        50
+      ]
+    },
+    {
+      "opcode": 128,
+      "enum": "PPC_OP_LFSX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00042e",
+      "reference_ids": [
+        180
+      ]
+    },
+    {
+      "opcode": 129,
+      "enum": "PPC_OP_LFSUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 100,
+      "representative_raw": "0x7c01046e",
+      "reference_ids": [
+        181
+      ]
+    },
+    {
+      "opcode": 130,
+      "enum": "PPC_OP_LFDX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c0004ae",
+      "reference_ids": [
+        182
+      ]
+    },
+    {
+      "opcode": 131,
+      "enum": "PPC_OP_LFDUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 100,
+      "representative_raw": "0x7c0104ee",
+      "reference_ids": [
+        183
+      ]
+    },
+    {
+      "opcode": 132,
+      "enum": "PPC_OP_STFSX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00052e",
+      "reference_ids": [
+        184
+      ]
+    },
+    {
+      "opcode": 133,
+      "enum": "PPC_OP_STFSUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 100,
+      "representative_raw": "0x7c01056e",
+      "reference_ids": [
+        185
+      ]
+    },
+    {
+      "opcode": 134,
+      "enum": "PPC_OP_STFDX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c0005ae",
+      "reference_ids": [
+        186
+      ]
+    },
+    {
+      "opcode": 135,
+      "enum": "PPC_OP_STFDUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 100,
+      "representative_raw": "0x7c0105ee",
+      "reference_ids": [
+        187
+      ]
+    },
+    {
+      "opcode": 136,
+      "enum": "PPC_OP_FADDS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xec00002a",
+      "reference_ids": [
+        211
+      ]
+    },
+    {
+      "opcode": 137,
+      "enum": "PPC_OP_FSUBS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xec000028",
+      "reference_ids": [
+        210
+      ]
+    },
+    {
+      "opcode": 138,
+      "enum": "PPC_OP_FMULS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xec000032",
+      "reference_ids": [
+        213
+      ]
+    },
+    {
+      "opcode": 139,
+      "enum": "PPC_OP_FDIVS",
+      "valid": true,
+      "modeled_units": 17,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xec000024",
+      "reference_ids": [
+        209
+      ]
+    },
+    {
+      "opcode": 140,
+      "enum": "PPC_OP_FRES",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xec000030",
+      "reference_ids": [
+        212
+      ]
+    },
+    {
+      "opcode": 141,
+      "enum": "PPC_OP_FMADDS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xec00003a",
+      "reference_ids": [
+        215
+      ]
+    },
+    {
+      "opcode": 142,
+      "enum": "PPC_OP_FMSUBS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xec000038",
+      "reference_ids": [
+        214
+      ]
+    },
+    {
+      "opcode": 143,
+      "enum": "PPC_OP_FNMADDS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xec00003e",
+      "reference_ids": [
+        217
+      ]
+    },
+    {
+      "opcode": 144,
+      "enum": "PPC_OP_FNMSUBS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xec00003c",
+      "reference_ids": [
+        216
+      ]
+    },
+    {
+      "opcode": 145,
+      "enum": "PPC_OP_FADD",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xfc00002a",
+      "reference_ids": [
+        235
+      ]
+    },
+    {
+      "opcode": 146,
+      "enum": "PPC_OP_FSUB",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xfc000028",
+      "reference_ids": [
+        234
+      ]
+    },
+    {
+      "opcode": 147,
+      "enum": "PPC_OP_FMUL",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xfc000032",
+      "reference_ids": [
+        237
+      ]
+    },
+    {
+      "opcode": 148,
+      "enum": "PPC_OP_FDIV",
+      "valid": true,
+      "modeled_units": 31,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xfc000024",
+      "reference_ids": [
+        233
+      ]
+    },
+    {
+      "opcode": 149,
+      "enum": "PPC_OP_FRSQRTE",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xfc000034",
+      "reference_ids": [
+        238
+      ]
+    },
+    {
+      "opcode": 150,
+      "enum": "PPC_OP_FMADD",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xfc00003a",
+      "reference_ids": [
+        240
+      ]
+    },
+    {
+      "opcode": 151,
+      "enum": "PPC_OP_FMSUB",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xfc000038",
+      "reference_ids": [
+        239
+      ]
+    },
+    {
+      "opcode": 152,
+      "enum": "PPC_OP_FNMADD",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xfc00003e",
+      "reference_ids": [
+        242
+      ]
+    },
+    {
+      "opcode": 153,
+      "enum": "PPC_OP_FNMSUB",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xfc00003c",
+      "reference_ids": [
+        241
+      ]
+    },
+    {
+      "opcode": 154,
+      "enum": "PPC_OP_FCTIW",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xfc00001c",
+      "reference_ids": [
+        221
+      ]
+    },
+    {
+      "opcode": 155,
+      "enum": "PPC_OP_FCTIWZ",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xfc00001e",
+      "reference_ids": [
+        222
+      ]
+    },
+    {
+      "opcode": 156,
+      "enum": "PPC_OP_FMR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xfc000090",
+      "reference_ids": [
+        223
+      ]
+    },
+    {
+      "opcode": 157,
+      "enum": "PPC_OP_FNEG",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xfc000050",
+      "reference_ids": [
+        225
+      ]
+    },
+    {
+      "opcode": 158,
+      "enum": "PPC_OP_FABS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xfc000210",
+      "reference_ids": [
+        218
+      ]
+    },
+    {
+      "opcode": 159,
+      "enum": "PPC_OP_FNABS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xfc000110",
+      "reference_ids": [
+        224
+      ]
+    },
+    {
+      "opcode": 160,
+      "enum": "PPC_OP_FRSP",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xfc000018",
+      "reference_ids": [
+        226
+      ]
+    },
+    {
+      "opcode": 161,
+      "enum": "PPC_OP_FSEL",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0xfc00002e",
+      "reference_ids": [
+        236
+      ]
+    },
+    {
+      "opcode": 162,
+      "enum": "PPC_OP_FCMPU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xfc000000",
+      "reference_ids": [
+        220
+      ]
+    },
+    {
+      "opcode": 163,
+      "enum": "PPC_OP_FCMPO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0xfc000040",
+      "reference_ids": [
+        219
+      ]
+    },
+    {
+      "opcode": 164,
+      "enum": "PPC_OP_MTFSB0",
+      "valid": true,
+      "modeled_units": 3,
+      "synthetic_case_count": 10,
+      "representative_raw": "0xfc00008c",
+      "reference_ids": [
+        229
+      ]
+    },
+    {
+      "opcode": 165,
+      "enum": "PPC_OP_MTFSB1",
+      "valid": true,
+      "modeled_units": 3,
+      "synthetic_case_count": 10,
+      "representative_raw": "0xfc00004c",
+      "reference_ids": [
+        230
+      ]
+    },
+    {
+      "opcode": 166,
+      "enum": "PPC_OP_MCRFS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 4,
+      "representative_raw": "0xfc000080",
+      "reference_ids": [
+        227
+      ]
+    },
+    {
+      "opcode": 167,
+      "enum": "PPC_OP_MFFS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 10,
+      "representative_raw": "0xfc00048e",
+      "reference_ids": [
+        228
+      ]
+    },
+    {
+      "opcode": 168,
+      "enum": "PPC_OP_MTFSF",
+      "valid": true,
+      "modeled_units": 3,
+      "synthetic_case_count": 120,
+      "representative_raw": "0xfc00058e",
+      "reference_ids": [
+        232
+      ]
+    },
+    {
+      "opcode": 169,
+      "enum": "PPC_OP_MTFSFI",
+      "valid": true,
+      "modeled_units": 3,
+      "synthetic_case_count": 12,
+      "representative_raw": "0xfc00010c",
+      "reference_ids": [
+        231
+      ]
+    },
+    {
+      "opcode": 170,
+      "enum": "PPC_OP_PSQ_L",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256016,
+      "representative_raw": "0xe0000000",
+      "reference_ids": [
+        51
+      ]
+    },
+    {
+      "opcode": 171,
+      "enum": "PPC_OP_PSQ_LU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 204816,
+      "representative_raw": "0xe4010000",
+      "reference_ids": [
+        52
+      ]
+    },
+    {
+      "opcode": 172,
+      "enum": "PPC_OP_PSQ_ST",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 256016,
+      "representative_raw": "0xf0000000",
+      "reference_ids": [
+        53
+      ]
+    },
+    {
+      "opcode": 173,
+      "enum": "PPC_OP_PSQ_STU",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 204816,
+      "representative_raw": "0xf4010000",
+      "reference_ids": [
+        54
+      ]
+    },
+    {
+      "opcode": 174,
+      "enum": "PPC_OP_PSQ_LX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 2000,
+      "representative_raw": "0x1000000c",
+      "reference_ids": [
+        85
+      ]
+    },
+    {
+      "opcode": 175,
+      "enum": "PPC_OP_PSQ_LUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 1600,
+      "representative_raw": "0x1001004c",
+      "reference_ids": [
+        87
+      ]
+    },
+    {
+      "opcode": 176,
+      "enum": "PPC_OP_PSQ_STX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 2000,
+      "representative_raw": "0x1000000e",
+      "reference_ids": [
+        86
+      ]
+    },
+    {
+      "opcode": 177,
+      "enum": "PPC_OP_PSQ_STUX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 1600,
+      "representative_raw": "0x1001004e",
+      "reference_ids": [
+        88
+      ]
+    },
+    {
+      "opcode": 178,
+      "enum": "PPC_OP_PS_ADD",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x1000002a",
+      "reference_ids": [
+        76
+      ]
+    },
+    {
+      "opcode": 179,
+      "enum": "PPC_OP_PS_SUB",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x10000028",
+      "reference_ids": [
+        75
+      ]
+    },
+    {
+      "opcode": 180,
+      "enum": "PPC_OP_PS_MUL",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x10000032",
+      "reference_ids": [
+        79
+      ]
+    },
+    {
+      "opcode": 181,
+      "enum": "PPC_OP_PS_DIV",
+      "valid": true,
+      "modeled_units": 17,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x10000024",
+      "reference_ids": [
+        74
+      ]
+    },
+    {
+      "opcode": 182,
+      "enum": "PPC_OP_PS_RES",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x10000030",
+      "reference_ids": [
+        78
+      ]
+    },
+    {
+      "opcode": 183,
+      "enum": "PPC_OP_PS_RSQRTE",
+      "valid": true,
+      "modeled_units": 2,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x10000034",
+      "reference_ids": [
+        80
+      ]
+    },
+    {
+      "opcode": 184,
+      "enum": "PPC_OP_PS_MADD",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x1000003a",
+      "reference_ids": [
+        82
+      ]
+    },
+    {
+      "opcode": 185,
+      "enum": "PPC_OP_PS_MSUB",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x10000038",
+      "reference_ids": [
+        81
+      ]
+    },
+    {
+      "opcode": 186,
+      "enum": "PPC_OP_PS_NMADD",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x1000003e",
+      "reference_ids": [
+        84
+      ]
+    },
+    {
+      "opcode": 187,
+      "enum": "PPC_OP_PS_NMSUB",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x1000003c",
+      "reference_ids": [
+        83
+      ]
+    },
+    {
+      "opcode": 188,
+      "enum": "PPC_OP_PS_NEG",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x10000050",
+      "reference_ids": [
+        57
+      ]
+    },
+    {
+      "opcode": 189,
+      "enum": "PPC_OP_PS_ABS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x10000210",
+      "reference_ids": [
+        59
+      ]
+    },
+    {
+      "opcode": 190,
+      "enum": "PPC_OP_PS_NABS",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x10000110",
+      "reference_ids": [
+        58
+      ]
+    },
+    {
+      "opcode": 191,
+      "enum": "PPC_OP_PS_MR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x10000090",
+      "reference_ids": [
+        61
+      ]
+    },
+    {
+      "opcode": 192,
+      "enum": "PPC_OP_PS_SUM0",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x10000014",
+      "reference_ids": [
+        68
+      ]
+    },
+    {
+      "opcode": 193,
+      "enum": "PPC_OP_PS_SUM1",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x10000016",
+      "reference_ids": [
+        69
+      ]
+    },
+    {
+      "opcode": 194,
+      "enum": "PPC_OP_PS_MULS0",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x10000018",
+      "reference_ids": [
+        70
+      ]
+    },
+    {
+      "opcode": 195,
+      "enum": "PPC_OP_PS_MULS1",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x1000001a",
+      "reference_ids": [
+        71
+      ]
+    },
+    {
+      "opcode": 196,
+      "enum": "PPC_OP_PS_MADDS0",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x1000001c",
+      "reference_ids": [
+        72
+      ]
+    },
+    {
+      "opcode": 197,
+      "enum": "PPC_OP_PS_MADDS1",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x1000001e",
+      "reference_ids": [
+        73
+      ]
+    },
+    {
+      "opcode": 198,
+      "enum": "PPC_OP_PS_MERGE00",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x10000420",
+      "reference_ids": [
+        63
+      ]
+    },
+    {
+      "opcode": 199,
+      "enum": "PPC_OP_PS_MERGE01",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x10000460",
+      "reference_ids": [
+        64
+      ]
+    },
+    {
+      "opcode": 200,
+      "enum": "PPC_OP_PS_MERGE10",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x100004a0",
+      "reference_ids": [
+        65
+      ]
+    },
+    {
+      "opcode": 201,
+      "enum": "PPC_OP_PS_MERGE11",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x100004e0",
+      "reference_ids": [
+        66
+      ]
+    },
+    {
+      "opcode": 202,
+      "enum": "PPC_OP_PS_CMPU0",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x10000000",
+      "reference_ids": [
+        55
+      ]
+    },
+    {
+      "opcode": 203,
+      "enum": "PPC_OP_PS_CMPO0",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x10000040",
+      "reference_ids": [
+        56
+      ]
+    },
+    {
+      "opcode": 204,
+      "enum": "PPC_OP_PS_CMPU1",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x10000080",
+      "reference_ids": [
+        60
+      ]
+    },
+    {
+      "opcode": 205,
+      "enum": "PPC_OP_PS_CMPO1",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 50,
+      "representative_raw": "0x100000c0",
+      "reference_ids": [
+        62
+      ]
+    },
+    {
+      "opcode": 206,
+      "enum": "PPC_OP_PS_SEL",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 8000,
+      "representative_raw": "0x1000002e",
+      "reference_ids": [
+        77
+      ]
+    },
+    {
+      "opcode": 207,
+      "enum": "PPC_OP_MULLW",
+      "valid": true,
+      "modeled_units": 5,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c0001d6",
+      "reference_ids": [
+        118
+      ]
+    },
+    {
+      "opcode": 208,
+      "enum": "PPC_OP_MULLWO",
+      "valid": true,
+      "modeled_units": 5,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c0005d6",
+      "reference_ids": [
+        119
+      ]
+    },
+    {
+      "opcode": 209,
+      "enum": "PPC_OP_MULHW",
+      "valid": true,
+      "modeled_units": 5,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000096",
+      "reference_ids": [
+        116
+      ]
+    },
+    {
+      "opcode": 210,
+      "enum": "PPC_OP_MULHWU",
+      "valid": true,
+      "modeled_units": 5,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000016",
+      "reference_ids": [
+        117
+      ]
+    },
+    {
+      "opcode": 211,
+      "enum": "PPC_OP_DIVW",
+      "valid": true,
+      "modeled_units": 40,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c0003d6",
+      "reference_ids": [
+        112
+      ]
+    },
+    {
+      "opcode": 212,
+      "enum": "PPC_OP_DIVWO",
+      "valid": true,
+      "modeled_units": 40,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c0007d6",
+      "reference_ids": [
+        113
+      ]
+    },
+    {
+      "opcode": 213,
+      "enum": "PPC_OP_DIVWU",
+      "valid": true,
+      "modeled_units": 40,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000396",
+      "reference_ids": [
+        114
+      ]
+    },
+    {
+      "opcode": 214,
+      "enum": "PPC_OP_DIVWUO",
+      "valid": true,
+      "modeled_units": 40,
+      "synthetic_case_count": 250,
+      "representative_raw": "0x7c000796",
+      "reference_ids": [
+        115
+      ]
+    },
+    {
+      "opcode": 215,
+      "enum": "PPC_OP_DCBZ",
+      "valid": true,
+      "modeled_units": 5,
+      "synthetic_case_count": 25,
+      "representative_raw": "0x7c0007ec",
+      "reference_ids": [
+        155
+      ]
+    },
+    {
+      "opcode": 216,
+      "enum": "PPC_OP_DCBZ_L",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 25,
+      "representative_raw": "0x100007ec",
+      "reference_ids": [
+        67
+      ]
+    },
+    {
+      "opcode": 217,
+      "enum": "PPC_OP_DCBST",
+      "valid": true,
+      "modeled_units": 5,
+      "synthetic_case_count": 25,
+      "representative_raw": "0x7c00006c",
+      "reference_ids": [
+        149
+      ]
+    },
+    {
+      "opcode": 218,
+      "enum": "PPC_OP_DCBF",
+      "valid": true,
+      "modeled_units": 5,
+      "synthetic_case_count": 25,
+      "representative_raw": "0x7c0000ac",
+      "reference_ids": [
+        150
+      ]
+    },
+    {
+      "opcode": 219,
+      "enum": "PPC_OP_DCBTST",
+      "valid": true,
+      "modeled_units": 2,
+      "synthetic_case_count": 25,
+      "representative_raw": "0x7c0001ec",
+      "reference_ids": [
+        151
+      ]
+    },
+    {
+      "opcode": 220,
+      "enum": "PPC_OP_DCBT",
+      "valid": true,
+      "modeled_units": 2,
+      "synthetic_case_count": 25,
+      "representative_raw": "0x7c00022c",
+      "reference_ids": [
+        152
+      ]
+    },
+    {
+      "opcode": 221,
+      "enum": "PPC_OP_DCBI",
+      "valid": true,
+      "modeled_units": 5,
+      "synthetic_case_count": 25,
+      "representative_raw": "0x7c0003ac",
+      "reference_ids": [
+        153
+      ]
+    },
+    {
+      "opcode": 222,
+      "enum": "PPC_OP_ICBI",
+      "valid": true,
+      "modeled_units": 4,
+      "synthetic_case_count": 25,
+      "representative_raw": "0x7c0007ac",
+      "reference_ids": [
+        203
+      ]
+    },
+    {
+      "opcode": 223,
+      "enum": "PPC_OP_SYNC",
+      "valid": true,
+      "modeled_units": 3,
+      "synthetic_case_count": 3,
+      "representative_raw": "0x7c0004ac",
+      "reference_ids": [
+        202
+      ]
+    },
+    {
+      "opcode": 224,
+      "enum": "PPC_OP_EIEIO",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 1,
+      "representative_raw": "0x7c0006ac",
+      "reference_ids": [
+        206
+      ]
+    },
+    {
+      "opcode": 225,
+      "enum": "PPC_OP_ISYNC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 1,
+      "representative_raw": "0x4c00012c",
+      "reference_ids": [
+        99
+      ]
+    },
+    {
+      "opcode": 226,
+      "enum": "PPC_OP_MCRXR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 2,
+      "representative_raw": "0x7c000400",
+      "reference_ids": [
+        198
+      ]
+    },
+    {
+      "opcode": 227,
+      "enum": "PPC_OP_MFMSR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 5,
+      "representative_raw": "0x7c0000a6",
+      "reference_ids": [
+        190
+      ]
+    },
+    {
+      "opcode": 228,
+      "enum": "PPC_OP_MTMSR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 5,
+      "representative_raw": "0x7c000124",
+      "reference_ids": [
+        192
+      ]
+    },
+    {
+      "opcode": 229,
+      "enum": "PPC_OP_MFSR",
+      "valid": true,
+      "modeled_units": 3,
+      "synthetic_case_count": 20,
+      "representative_raw": "0x7c0004a6",
+      "reference_ids": [
+        199
+      ]
+    },
+    {
+      "opcode": 230,
+      "enum": "PPC_OP_MFSRIN",
+      "valid": true,
+      "modeled_units": 3,
+      "synthetic_case_count": 25,
+      "representative_raw": "0x7c000526",
+      "reference_ids": [
+        200
+      ]
+    },
+    {
+      "opcode": 231,
+      "enum": "PPC_OP_MTSR",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 20,
+      "representative_raw": "0x7c0001a4",
+      "reference_ids": [
+        193
+      ]
+    },
+    {
+      "opcode": 232,
+      "enum": "PPC_OP_MTSRIN",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 25,
+      "representative_raw": "0x7c0001e4",
+      "reference_ids": [
+        194
+      ]
+    },
+    {
+      "opcode": 233,
+      "enum": "PPC_OP_TLBIE",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 5,
+      "representative_raw": "0x7c000264",
+      "reference_ids": [
+        207
+      ]
+    },
+    {
+      "opcode": 234,
+      "enum": "PPC_OP_TLBSYNC",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 1,
+      "representative_raw": "0x7c00046c",
+      "reference_ids": [
+        208
+      ]
+    },
+    {
+      "opcode": 235,
+      "enum": "PPC_OP_ECIWX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00026c",
+      "reference_ids": [
+        204
+      ]
+    },
+    {
+      "opcode": 236,
+      "enum": "PPC_OP_ECOWX",
+      "valid": true,
+      "modeled_units": 1,
+      "synthetic_case_count": 125,
+      "representative_raw": "0x7c00036c",
+      "reference_ids": [
+        205
+      ]
+    }
+  ]
+}
