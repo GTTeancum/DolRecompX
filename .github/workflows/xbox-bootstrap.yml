@@ -8,6 +8,7 @@ on:
       - src/**
       - tests/**
       - CMakeLists.txt
+      - tools/timing/**
   workflow_dispatch:
 
 permissions:
@@ -47,6 +48,13 @@ jobs:
         run: |
           set -euo pipefail
           python3 tests/test_cli_offline.py build/dolrecomp 2>&1 | tee build/offline-cli.log
+      - name: Validate opt-in bounded synthetic clock (no CPU integration)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake -S . -B build-clock -DCMAKE_BUILD_TYPE=Release -DDOLRECOMP_ENABLE_SYNTHETIC_CLOCK=ON
+          cmake --build build-clock --parallel 2 --target synthetic_clock_test clock_contract_test
+          ctest --test-dir build-clock --output-on-failure -R '^(synthetic_clock|clock_contract|synthetic_clock_tools)$'
       - name: Collect build evidence
         if: always()
         shell: bash
@@ -54,6 +62,7 @@ jobs:
           mkdir -p evidence
           cp export/REVISION.txt export/SUBMODULES.txt evidence/
           cp build/Testing/Temporary/LastTest.log evidence/ 2>/dev/null || true
+          cp build-clock/Testing/Temporary/LastTest.log evidence/ClockLastTest.log 2>/dev/null || true
           cp build/offline-cli.log evidence/ 2>/dev/null || true
           cp build/CMakeCache.txt evidence/ 2>/dev/null || true
           find build -maxdepth 2 -type f -iname '*dolrecomp*' -executable -exec cp {} evidence/ \;

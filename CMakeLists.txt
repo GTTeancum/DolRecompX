@@ -5,6 +5,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 option(DOLRECOMP_ENABLE_LLVM "Build the LLVM object backend" OFF)
 option(DOLRECOMP_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
+option(DOLRECOMP_ENABLE_SYNTHETIC_CLOCK "Build the bounded experimental clock oracle (not production timing)" OFF)
 
 # Discover LLVM before creating targets so its MSVC runtime choice is uniform.
 if(DOLRECOMP_ENABLE_LLVM)
@@ -680,4 +681,28 @@ if(Python3_Interpreter_FOUND AND NOT CMAKE_CROSSCOMPILING AND
     add_test(NAME functional_cost_manifest
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_functional_cost_manifest.py
                 --cc-path ${CMAKE_C_COMPILER})
+endif()
+
+if(DOLRECOMP_ENABLE_SYNTHETIC_CLOCK)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_library(dr_clock_provider STATIC src/experimental/provider_adapter.c)
+    target_include_directories(dr_clock_provider PUBLIC ${DOLRECOMP_SRC})
+    add_library(dr_synthetic_clock STATIC src/experimental/functional_clock.c)
+    target_include_directories(dr_synthetic_clock PUBLIC ${DOLRECOMP_SRC})
+    target_link_libraries(dr_synthetic_clock PUBLIC dr_clock_provider)
+    set(_clock_vectors ${CMAKE_CURRENT_BINARY_DIR}/synthetic-clock/arithmetic_vectors.h)
+    add_custom_command(OUTPUT ${_clock_vectors}
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/timing/generate_arithmetic_vectors.py
+                --output ${_clock_vectors}
+        DEPENDS tools/timing/generate_arithmetic_vectors.py
+        VERBATIM)
+    add_executable(synthetic_clock_test tests/experimental/test_functional_clock.c ${_clock_vectors})
+    target_include_directories(synthetic_clock_test PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/synthetic-clock)
+    target_link_libraries(synthetic_clock_test PRIVATE dr_synthetic_clock)
+    add_test(NAME synthetic_clock COMMAND synthetic_clock_test)
+    add_executable(clock_contract_test tests/experimental/test_clock_contract.c)
+    target_link_libraries(clock_contract_test PRIVATE dr_clock_provider)
+    add_test(NAME clock_contract COMMAND clock_contract_test)
+    add_test(NAME synthetic_clock_tools
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/experimental/test_clock_tools.py)
 endif()
