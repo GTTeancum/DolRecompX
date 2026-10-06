@@ -1422,30 +1422,23 @@ static void exec_inst(CPUState* cpu, const PPCInst* inst) {
         break;
 
     case PPC_OP_BC:
+        if (inst->lk)
+            cpu->lr = inst->address + 4;
         if (branch_condition(cpu, inst->bo, inst->bi)) {
-            if (inst->lk)
-                cpu->lr = inst->address + 4;
             cpu->pc = inst->branch_target;
         }
         break;
 
     case PPC_OP_BCLR:
+    case PPC_OP_BCCTR: {
+        u32 target = (inst->op == PPC_OP_BCLR ? cpu->lr : cpu->ctr) & ~3u;
+        if (inst->lk)
+            cpu->lr = inst->address + 4;
         if (branch_condition(cpu, inst->bo, inst->bi)) {
-            u32 target = cpu->lr & ~3u;
-            if (inst->lk)
-                cpu->lr = inst->address + 4;
             cpu->pc = target;
         }
         break;
-
-    case PPC_OP_BCCTR:
-        if (branch_condition(cpu, inst->bo, inst->bi)) {
-            u32 target = cpu->ctr & ~3u;
-            if (inst->lk)
-                cpu->lr = inst->address + 4;
-            cpu->pc = target;
-        }
-        break;
+    }
 
     case PPC_OP_SC:
         ppc_system_call_exception(cpu, inst->address);
@@ -3238,6 +3231,30 @@ static void test_branches_cr_spr(CPUState* cpu) {
     cpu->ctr = 0x80005679;
     exec_raw(cpu, 0x4E800420, BASE);
     check_eq(cpu->pc, 0x80005678, "bcctr/bctr uses CTR");
+
+    cpu->cr = 0;
+    cpu->lr = 0x2003;
+    exec_raw(cpu, 0x4D800021, BASE);
+    check_eq(cpu->pc, BASE + 4, "untaken bclrl falls through");
+    check_eq(cpu->lr, BASE + 4, "untaken bclrl still sets LR");
+    cpu->cr = 0x80000000;
+    cpu->lr = 0x2003;
+    exec_raw(cpu, 0x4D800021, BASE);
+    check_eq(cpu->pc, 0x2000, "taken bclrl uses old aligned LR");
+    check_eq(cpu->lr, BASE + 4, "taken bclrl sets new LR");
+    cpu->cr = 0;
+    cpu->ctr = 2;
+    cpu->lr = 0x3003;
+    exec_raw(cpu, 0x41000101, BASE);
+    check_eq(cpu->pc, BASE + 4, "CR-rejected bcl falls through");
+    check_eq(cpu->ctr, 1, "CR-rejected bcl still decrements CTR");
+    check_eq(cpu->lr, BASE + 4, "CR-rejected bcl still sets LR");
+    cpu->ctr = 0x2003;
+    cpu->lr = 0x3003;
+    exec_raw(cpu, 0x4D800421, BASE);
+    check_eq(cpu->pc, BASE + 4, "untaken bcctrl falls through");
+    check_eq(cpu->ctr, 0x2003, "bcctrl preserves CTR");
+    check_eq(cpu->lr, BASE + 4, "untaken bcctrl still sets LR");
 
     static const u8 crand_expected[4] = {0, 0, 0, 1};
     static const u8 crandc_expected[4] = {0, 0, 1, 0};

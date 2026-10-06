@@ -428,6 +428,16 @@ add_executable(test_c_execute
 target_link_libraries(test_c_execute PRIVATE dr_cpu)
 add_test(NAME c_execute COMMAND test_c_execute)
 
+add_executable(test_branch_link_emit tests/test_branch_link_emit.c)
+target_link_libraries(test_branch_link_emit PRIVATE dr_backend)
+set(DOLRECOMP_BRANCH_TEST_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/branch_link_generated.c)
+add_custom_command(OUTPUT ${DOLRECOMP_BRANCH_TEST_SOURCE}
+    COMMAND test_branch_link_emit ${DOLRECOMP_BRANCH_TEST_SOURCE}
+    DEPENDS test_branch_link_emit VERBATIM)
+add_executable(test_branch_link_execute tests/test_branch_link_execute.c ${DOLRECOMP_BRANCH_TEST_SOURCE})
+target_link_libraries(test_branch_link_execute PRIVATE dr_cpu)
+add_test(NAME branch_link_execute COMMAND test_branch_link_execute)
+
 add_executable(test_fpscr tests/test_fpscr.c)
 target_link_libraries(test_fpscr PRIVATE dr_cpu)
 add_test(NAME fpscr COMMAND test_fpscr)

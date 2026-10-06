@@ -381,7 +381,6 @@ static void emit_direct_branch(FILE* out, const PPCInst* inst,
     bool local_backward = local_target && inst->branch_target <= inst->address;
 
     if (inst->lk) {
-        fprintf(out, "            ctx->lr = 0x%08Xu;\n", inst->address + 4);
         if (local_target) {
             if (local_backward) {
                 fprintf(out, "            if (ctx->downcount <= -(s64)DOLRECOMP_C_LOOP_CYCLE_BUDGET) {\n");
@@ -422,10 +421,10 @@ static void emit_dynamic_branch(FILE* out, const PPCInst* inst,
     fprintf(out, "    {\n");
     fprintf(out, "        u32 target = %s;\n", target_expr);
     emit_branch_condition(out, inst->bo, inst->bi);
-    fprintf(out, "        if (ctr_ok && cr_ok) {\n");
     if (inst->lk) {
-        fprintf(out, "            ctx->lr = 0x%08Xu;\n", inst->address + 4);
+        fprintf(out, "        ctx->lr = 0x%08Xu;\n", inst->address + 4);
     }
+    fprintf(out, "        if (ctr_ok && cr_ok) {\n");
     fprintf(out, "            ctx->pc = target;\n");
     if (route_local_returns)
         fprintf(out, "            goto return_dispatch_%08X;\n", function_address);
@@ -1653,6 +1652,8 @@ static void emit_instruction_with_range(FILE* out, const PPCInst* inst,
 
     case PPC_OP_B:
         fprintf(out, "    {\n");
+        if (inst->lk)
+            fprintf(out, "        ctx->lr = 0x%08Xu;\n", inst->address + 4u);
         emit_direct_branch(out, inst,
                            branch_target_is_local(func_start, func_end, inst->branch_target),
                            direct_backedge, func_start, func_end);
@@ -1662,6 +1663,9 @@ static void emit_instruction_with_range(FILE* out, const PPCInst* inst,
     case PPC_OP_BC:
         fprintf(out, "    {\n");
         emit_branch_condition(out, inst->bo, inst->bi);
+        /* LK updates LR even when the condition rejects the branch. */
+        if (inst->lk)
+            fprintf(out, "        ctx->lr = 0x%08Xu;\n", inst->address + 4u);
         fprintf(out, "        if (ctr_ok && cr_ok) {\n");
         emit_direct_branch(out, inst,
                            branch_target_is_local(func_start, func_end, inst->branch_target),
