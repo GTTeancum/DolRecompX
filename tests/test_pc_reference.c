@@ -3343,8 +3343,13 @@ static void test_branches_cr_spr(CPUState* cpu) {
     exec_raw(cpu, make_xfx(371, 12, 269), BASE);
     check_eq(cpu->gpr[12], 0x99AABBCC, "mftbu reads TBU");
 
+    cpu->msr = 0x4000;
+    exec_raw(cpu, make_xfx(339, 11, 268), BASE);
+    check_eq(cpu->gpr[11], 0x55667788, "mfspr reads user TBL alias");
+    exec_raw(cpu, make_xfx(339, 12, 269), BASE);
+    check_eq(cpu->gpr[12], 0x99AABBCC, "mfspr reads user TBU alias");
+    check_eq(cpu->exception, 0, "mfspr timebase aliases are legal in user mode");
     check_illegal_spr(cpu, 467, 287, "mtspr PVR traps");
-    check_illegal_spr(cpu, 339, 268, "mfspr TBL alias traps");
     check_illegal_spr(cpu, 339, 284, "mfspr TBL write alias traps");
     check_illegal_spr(cpu, 339, 1023, "mfspr undefined SPR traps");
     check_illegal_spr(cpu, 467, 1023, "mtspr undefined SPR traps");

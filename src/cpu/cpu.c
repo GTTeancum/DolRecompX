@@ -94,6 +94,7 @@ void cpu_reset(CPUState* cpu) {
     PPCSPRWrite spr_write = cpu->spr_write;
     PPCCacheControl cache_control = cpu->cache_control;
     u32 runtime_cpu = cpu->runtime_cpu;
+    PPCTimebaseAccess timebase_access = cpu->timebase_access;
 
     memset(cpu, 0, sizeof(*cpu));
     cpu->ram = ram;
@@ -112,6 +113,7 @@ void cpu_reset(CPUState* cpu) {
     cpu->spr_write = spr_write;
     cpu->cache_control = cache_control;
     cpu->runtime_cpu = runtime_cpu;
+    cpu->timebase_access = timebase_access;
 
     if (cpu->ram)
         memset(cpu->ram, 0, cpu->ram_size);
@@ -420,13 +422,14 @@ void ppc_alignment_exception(CPUState* cpu, u32 ea, u32 cia) {
 }
 
 u32 ppc_mftb(CPUState* cpu, u16 tbr, u32 cia) {
-    if (tbr == 268)
-        return (u32)cpu->timebase;
-    if (tbr == 269)
-        return (u32)(cpu->timebase >> 32);
-
-    ppc_program_exception(cpu, PPC_PROGRAM_ILLEGAL, cia);
-    return 0;
+    /* Invalid encodings keep architectural exception precedence. */
+    if (tbr != 268 && tbr != 269) {
+        ppc_program_exception(cpu, PPC_PROGRAM_ILLEGAL, cia);
+        return 0;
+    }
+    if (cpu->timebase_access)
+        cpu->timebase_access(cpu, tbr, false, 0, cia);
+    return tbr == 268 ? (u32)cpu->timebase : (u32)(cpu->timebase >> 32);
 }
 
 enum {
@@ -519,6 +522,10 @@ u32 ppc_mfspr(CPUState* cpu, u16 spr, u32 cia) {
         return cpu->srr0;
     case 27:
         return cpu->srr1;
+    case 268:
+    case 269:
+        /* Gekko Table 2-52 permits these user-readable MFSPR aliases. */
+        return ppc_mftb(cpu, spr, cia);
     case 282:
         return cpu->ear;
     case 287:
@@ -578,9 +585,13 @@ void ppc_mtspr(CPUState* cpu, u16 spr, u32 value, u32 cia) {
         cpu->ear = value;
         return;
     case 284:
+        if (cpu->timebase_access)
+            cpu->timebase_access(cpu, spr, true, value, cia);
         cpu->timebase = (cpu->timebase & 0xFFFFFFFF00000000ull) | value;
         return;
     case 285:
+        if (cpu->timebase_access)
+            cpu->timebase_access(cpu, spr, true, value, cia);
         cpu->timebase = ((u64)value << 32) | (cpu->timebase & 0xFFFFFFFFull);
         return;
     case 912:

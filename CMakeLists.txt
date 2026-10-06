@@ -665,3 +665,7 @@ add_test(NAME broadway_spr COMMAND broadway_spr_test)
 add_executable(mem_write_check_test tests/test_mem_write_check.c)
 target_link_libraries(mem_write_check_test PRIVATE dr_cpu)
 add_test(NAME mem_write_check COMMAND mem_write_check_test)
+
+add_executable(timebase_access_test tests/test_timebase_access.c)
+target_link_libraries(timebase_access_test PRIVATE dr_cpu)
+add_test(NAME timebase_access COMMAND timebase_access_test)

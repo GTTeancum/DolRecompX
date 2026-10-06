@@ -60,6 +60,14 @@ typedef bool (*PPCHostCall)(CPUState* cpu, u32 address);
 typedef u32 (*PPCSPRRead)(CPUState* cpu, u16 spr, u32 cia);
 typedef void (*PPCSPRWrite)(CPUState* cpu, u16 spr, u32 value, u32 cia);
 typedef void (*PPCCacheControl)(CPUState* cpu, u8 operation, u32 ea, u32 cia);
+/* Optional access policy, called only after opcode/register legality and
+   privilege checks. Reads use TBR 268/269, write aliases use SPR 284/285;
+   value is zero for reads. A rejecting callback must not return. A returning
+   callback permits the architectural storage access; it does not supply time.
+   Null preserves standalone CPU storage behavior. Hosts that lack a modeled
+   guest clock can reject before GPR/timebase/reservation side effects. */
+typedef void (*PPCTimebaseAccess)(CPUState* cpu, u16 reg, bool write,
+                                  u32 value, u32 cia);
 
 enum {
     PPC_CACHE_DCBST,
@@ -129,6 +137,7 @@ struct CPUState {
     PPCCacheControl cache_control;
     /* Appended to avoid moving existing fields; rebuild every ABI consumer. */
     u32 runtime_cpu;
+    PPCTimebaseAccess timebase_access; /* Appended: rebuild all ABI consumers. */
 };
 
 typedef void (*PPCMemWriteJournal)(u32 offset, u32 size, void* user);

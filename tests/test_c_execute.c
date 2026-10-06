@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <setjmp.h>
 
 #include "../src/cpu/cpu.h"
 
@@ -52,6 +53,63 @@ static int check_system_callbacks(CPUState* c) {
     c->exception=0;c->msr=0x4000;c->pc=0x80004120;func_80004120(c);
     ok &= c->exception==PPC_EXC_PROGRAM&&cache_calls==4;
     printf("System callback sequence, address formation and privilege checks: %s\n",ok?"PASS":"FAIL");
+    return ok;
+}
+
+void func_80004140(CPUState*);
+void func_80004150(CPUState*);
+void func_80004160(CPUState*);
+void func_80004170(CPUState*);
+void func_80004180(CPUState*);
+void func_80004190(CPUState*);
+void func_800041A0(CPUState*);
+static jmp_buf clock_escape;
+static unsigned clock_calls,clock_reject;
+static u16 clock_reg;
+static bool clock_write;
+static u32 clock_value,clock_cia;
+static void clock_policy(CPUState*c,u16 reg,bool write,u32 value,u32 cia) {
+    (void)c;++clock_calls;clock_reg=reg;clock_write=write;clock_value=value;clock_cia=cia;
+    if(clock_reject)longjmp(clock_escape,1);
+}
+static unsigned run_clock_function(CPUState*c,void (*function)(CPUState*)) {
+    if(setjmp(clock_escape))return 1;
+    function(c);
+    return 0;
+}
+static int check_clock_generated(CPUState*c) {
+    void (*const funcs[])(CPUState*)={func_80004140,func_80004150,func_80004160,
+        func_80004170,func_80004180,func_80004190,func_800041A0};
+    const u16 regs[]={268,269,284,285,268,269,270};
+    int ok=1;
+    for(unsigned which=0;which<7;++which)for(unsigned user=0;user<2;++user)
+    for(unsigned hook=0;hook<3;++hook) {
+        cpu_reset(c);c->msr=user?0x4000:0;c->timebase=UINT64_C(0x123456789abcdef0);
+        c->gpr[3]=0xfeedface;c->reserve_valid=true;c->reserve_addr=0x80003020;
+        c->lr=0x81234560;c->pc=0x80004140+which*16;c->timebase_access=hook?clock_policy:NULL;
+        clock_calls=0;clock_reject=hook==2;
+        const unsigned trapped=run_clock_function(c,funcs[which]);
+        const int legal=which<6 && !(user && (which==2 || which==3));
+        if(!legal) {
+            ok &= !trapped && !clock_calls && c->exception==PPC_EXC_PROGRAM;
+            ok &= c->program_exception==(user && which<4?PPC_PROGRAM_PRIV:PPC_PROGRAM_ILLEGAL);
+            ok &= c->srr0==0x80004140+which*16 && c->timebase==UINT64_C(0x123456789abcdef0);
+            /* Reserved MFTB retains the original generated zero assignment;
+               privileged writes preserve the source. */
+            ok &= c->gpr[3]==(which==6?0u:0xfeedfaceu);
+        } else {
+            ok &= !c->exception && clock_calls==(hook?1u:0u) && trapped==(hook==2);
+            if(hook)ok &= clock_reg==regs[which] && clock_write==(which==2 || which==3) &&
+                clock_value==(which==2||which==3?0xfeedfaceu:0u) && clock_cia==0x80004140+which*16;
+            if(trapped)ok &= c->gpr[3]==0xfeedface && c->timebase==UINT64_C(0x123456789abcdef0);
+            else if(which<2 || which>=4)ok &= c->gpr[3]==(which==0||which==4?0x9abcdef0u:0x12345678u);
+            else ok &= c->timebase==(which==2?UINT64_C(0x12345678feedface):UINT64_C(0xfeedface9abcdef0));
+        }
+        ok &= c->reserve_valid && c->reserve_addr==0x80003020;
+        if(!ok){fprintf(stderr,"generated clock failed: which=%u user=%u hook=%u\n",which,user,hook);return 0;}
+    }
+    c->timebase_access=NULL;
+    printf("Generated clock opcode legality, policy and nonmutation (42 cases): %s\n",ok?"PASS":"FAIL");
     return ok;
 }
 
@@ -132,6 +190,7 @@ int main(void) {
     }
 
     int system_ok=check_system_callbacks(&cpu);
+    int clock_ok=check_clock_generated(&cpu);
     cpu_free(&cpu);
-    return !(system_ok && integer_ok && memory_ok && compare_ok && record_ok && merge_ok);
+    return !(clock_ok && system_ok && integer_ok && memory_ok && compare_ok && record_ok && merge_ok);
 }

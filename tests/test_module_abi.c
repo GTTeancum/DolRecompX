@@ -23,7 +23,7 @@ static int arm(CPUState* state, u32 blocks) {
 
 int main(void) {
 #if UINTPTR_MAX == UINT64_MAX
-    CHECK(sizeof(CPUState) == 3544u);
+    CHECK(sizeof(CPUState) == 3552u);
     CHECK(offsetof(CPUState, downcount) == 3480u);
     CHECK(offsetof(CPUState, cycle_budget) == 3488u);
     CHECK(offsetof(CPUState, exram) == 3496u);
@@ -32,6 +32,11 @@ int main(void) {
     CHECK(offsetof(CPUState, spr_write) == 3520u);
     CHECK(offsetof(CPUState, cache_control) == 3528u);
     CHECK(offsetof(CPUState, runtime_cpu) == 3536u);
+    CHECK(offsetof(CPUState, timebase_access) == 3544u);
+#elif defined(_WIN32) && defined(__i386__)
+    CHECK(sizeof(CPUState) == 3488u);
+    CHECK(offsetof(CPUState, runtime_cpu) == 3476u);
+    CHECK(offsetof(CPUState, timebase_access) == 3480u);
 #endif
     const DolRecompVariantV4 variants[] = {
         {DOLRECOMP_FEATURE_X86_V2, DOLRECOMP_SEMANTICS_EXACT, v2, "v2"},
@@ -44,7 +49,7 @@ int main(void) {
     };
     DolRecompLoadedModule loaded;
     /* The unchanged module descriptor has an explicit state-size gate.
-       Modules built against the pre-Broadway CPUState must fail that gate. */
+       Modules built against the pre-clock-policy CPUState must fail that gate. */
     module.cpu_state_size = sizeof(CPUState) - 8u;
     CHECK(!dolrecomp_select_module(&module, DOLRECOMP_FEATURE_X86_V3,
                                    DOLRECOMP_SEMANTICS_EXACT, &loaded, NULL));

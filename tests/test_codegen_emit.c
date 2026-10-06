@@ -197,6 +197,17 @@ int main(int argc, char** argv) {
     };
     if (!emit_function(out,invalidate_ops,2,0x80004120u)) return 1;
 
+    /* Exercise opcode legality independently from the optional clock policy. */
+    const u16 clock_registers[]={268,269,284,285,268,269,270};
+    const u16 clock_xos[]={371,371,467,467,339,339,371};
+    for (u32 n=0;n<7;++n) {
+        u32 address=0x80004140u+n*16;
+        u32 reg=clock_registers[n];
+        u32 raw=(31u<<26)|(3u<<21)|((reg&31u)<<16)|((reg>>5)<<11)|((u32)clock_xos[n]<<1);
+        PPCInst clock_ops[2]={ppc_decode(raw,address),ppc_decode(0x4e800020u,address+4)};
+        if (!emit_function(out,clock_ops,2,address)) return 1;
+    }
+
     FunctionList funcs = {0};
     if (!function_list_add(&funcs, BASE, BASE + (u32)count * 4u) ||
         !function_list_add(&funcs, BASE + 0x1000, BASE + 0x100C) ||
@@ -215,6 +226,8 @@ int main(int argc, char** argv) {
     }
     if (!function_list_add(&funcs,0x80004100u,0x8000411cu) ||
         !function_list_add(&funcs,0x80004120u,0x80004128u)) return 1;
+    for (u32 n=0;n<7;++n)
+        if (!function_list_add(&funcs,0x80004140u+n*16,0x80004148u+n*16)) return 1;
     emit_dispatch_helpers(out, &funcs, BASE);
     function_list_free(&funcs);
 
