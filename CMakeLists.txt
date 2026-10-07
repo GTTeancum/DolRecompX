@@ -6,12 +6,24 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 option(DOLRECOMP_ENABLE_LLVM "Build the LLVM object backend" OFF)
 option(DOLRECOMP_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
 option(DOLRECOMP_ENABLE_SYNTHETIC_CLOCK "Build the bounded experimental clock oracle (not production timing)" OFF)
+option(DOLRECOMP_ENABLE_FUNCTION_CERTIFICATION "Build read-only experimental DolIR certification" OFF)
+option(DOLRECOMP_ENABLE_VERIFIED_IDIOMS "Build Linux offline verified pure-DAG recovery" OFF)
 
-# Discover LLVM before creating targets so its MSVC runtime choice is uniform.
-if(DOLRECOMP_ENABLE_LLVM)
+if(DOLRECOMP_ENABLE_VERIFIED_IDIOMS)
+    if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        message(FATAL_ERROR "Verified idioms currently require the Linux offline Z3 adapter")
+    endif()
+    set(DOLRECOMP_ENABLE_FUNCTION_CERTIFICATION ON)
+endif()
+
+if(DOLRECOMP_ENABLE_LLVM OR DOLRECOMP_ENABLE_FUNCTION_CERTIFICATION)
     enable_language(CXX)
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
+endif()
+
+# Discover LLVM before creating targets so its MSVC runtime choice is uniform.
+if(DOLRECOMP_ENABLE_LLVM)
     find_package(LLVM CONFIG REQUIRED)
     if(LLVM_PACKAGE_VERSION VERSION_LESS 19 OR LLVM_PACKAGE_VERSION VERSION_GREATER_EQUAL 21)
         message(FATAL_ERROR "DolRecomp LLVM backend requires LLVM 19 or 20 (found ${LLVM_PACKAGE_VERSION})")
@@ -106,6 +118,14 @@ add_library(dr_ir STATIC
 target_include_directories(dr_ir PUBLIC ${DOLRECOMP_SRC})
 target_link_libraries(dr_ir PUBLIC dr_frontend)
 
+if(DOLRECOMP_ENABLE_LLVM OR DOLRECOMP_ENABLE_FUNCTION_CERTIFICATION)
+    add_library(dr_native_analysis STATIC
+        src/backend/llvm/abi_liveness.cpp
+        src/backend/llvm/call_liveness.cpp)
+    target_include_directories(dr_native_analysis PUBLIC ${DOLRECOMP_SRC})
+    target_link_libraries(dr_native_analysis PUBLIC dr_ir)
+endif()
+
 if(DOLRECOMP_ENABLE_LLVM)
     set(DOLRECOMP_PREOPT_POLICY_SOURCES
         src/backend/llvm/llvm_backend.cpp
@@ -134,9 +154,7 @@ if(DOLRECOMP_ENABLE_LLVM)
         src/backend/llvm/modern_wrapper.cpp
         src/backend/llvm/modern_state.cpp
         src/backend/llvm/native_abi.cpp
-        src/backend/llvm/abi_liveness.cpp
         src/backend/llvm/abi_policy.cpp
-        src/backend/llvm/call_liveness.cpp
         src/backend/llvm/abi_stats.cpp
         src/backend/llvm/cache_control.cpp
         src/backend/llvm/instruction_service.cpp
@@ -188,6 +206,7 @@ if(DOLRECOMP_ENABLE_LLVM)
     target_compile_definitions(dr_llvm PRIVATE
         DOLRECOMP_LLVM_POSTOPT_SOURCE_HASH="${DOLRECOMP_LLVM_POSTOPT_SOURCE_HASH}")
     target_link_libraries(dr_llvm PUBLIC dr_ir)
+    target_link_libraries(dr_llvm PRIVATE dr_native_analysis)
     
     set(DOLRECOMP_LLVM_COMPONENTS
         Core
@@ -715,4 +734,8 @@ if(DOLRECOMP_ENABLE_SYNTHETIC_CLOCK)
     add_test(NAME clock_contract COMMAND clock_contract_test)
     add_test(NAME synthetic_clock_tools
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/experimental/test_clock_tools.py)
+endif()
+
+if(DOLRECOMP_ENABLE_FUNCTION_CERTIFICATION)
+    include(cmake/function_pipeline.cmake)
 endif()

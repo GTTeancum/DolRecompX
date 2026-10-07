@@ -9,6 +9,8 @@ on:
       - tests/**
       - CMakeLists.txt
       - tools/timing/**
+      - tools/function_pipeline/**
+      - cmake/**
   workflow_dispatch:
 
 permissions:
@@ -71,4 +73,38 @@ jobs:
         with:
           name: DolRecompX-c-backend-baseline
           path: evidence/
+          retention-days: 14
+
+  optional-function-pipeline:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - name: Install optional host analysis dependencies
+        run: sudo apt-get update && sudo apt-get install -y libssl-dev libz3-4 clang
+      - name: Verify default-off dependency boundary
+        run: |
+          cmake -S . -B build-off -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=/nonexistent/disabled-cxx -DCMAKE_DISABLE_FIND_PACKAGE_OpenSSL=TRUE
+          cmake --build build-off --parallel 2
+          ctest --test-dir build-off --output-on-failure
+      - name: Build opt-in analysis and synthetic proof tools
+        run: |
+          cmake -S . -B build-analysis -DCMAKE_BUILD_TYPE=Release -DDOLRECOMP_ENABLE_VERIFIED_IDIOMS=ON
+          cmake --build build-analysis --parallel 2
+      - name: Validate certificates, fresh proofs and failure atomicity
+        run: ctest --test-dir build-analysis --output-on-failure --parallel 2
+      - name: Check default production output is unchanged
+        run: |
+          cmp build-off/c_execute_generated.c build-analysis/c_execute_generated.c
+          cmp build-off/branch_link_generated.c build-analysis/branch_link_generated.c
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: DolRecompX-function-pipeline-tests
+          path: |
+            build-analysis/Testing/Temporary/LastTest.log
+            build-analysis/function-pipeline-identity.json
           retention-days: 14

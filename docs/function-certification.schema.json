@@ -1,0 +1,567 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DolIR Function Certification v1 report",
+  "description": "Report only; never rewrite authority. All state masks are arrays of DolIRStateSlot indices. DOLIR_NO_BLOCK is 4294967295. CLOSED is scoped to checked external contracts.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "dolrecomp.function-certification.v1"
+        },
+        "source_fingerprint": {
+          "type": "string"
+        },
+        "contract_fingerprint": {
+          "type": "string"
+        },
+        "implementation_id": {
+          "type": "string"
+        },
+        "model": {
+          "const": "exact-original-cuts/full-state-observation"
+        },
+        "scope": {
+          "const": "declared-region-under-checked-external-contract"
+        },
+        "status": {
+          "enum": [
+            "OPEN",
+            "CONDITIONAL",
+            "CLOSED"
+          ]
+        },
+        "valid_ir": {
+          "type": "boolean"
+        },
+        "analysis_complete": {
+          "type": "boolean"
+        },
+        "mutates_ir": {
+          "type": "boolean"
+        },
+        "prunes_code": {
+          "type": "boolean"
+        },
+        "changes_timing": {
+          "type": "boolean"
+        },
+        "dimensions": {
+          "type": "object",
+          "properties": {
+            "entries": {
+              "enum": [
+                "OPEN",
+                "CONDITIONAL",
+                "CLOSED"
+              ]
+            },
+            "cfg": {
+              "enum": [
+                "OPEN",
+                "CONDITIONAL",
+                "CLOSED"
+              ]
+            },
+            "effects": {
+              "enum": [
+                "OPEN",
+                "CONDITIONAL",
+                "CLOSED"
+              ]
+            },
+            "returns": {
+              "enum": [
+                "OPEN",
+                "CONDITIONAL",
+                "CLOSED"
+              ]
+            },
+            "observations": {
+              "enum": [
+                "OPEN",
+                "CONDITIONAL",
+                "CLOSED"
+              ]
+            }
+          },
+          "required": [
+            "entries",
+            "cfg",
+            "effects",
+            "returns",
+            "observations"
+          ],
+          "additionalProperties": false
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dimension": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              },
+              "block": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              }
+            },
+            "required": [
+              "dimension",
+              "code",
+              "block"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "obligation": {
+                "type": "string"
+              },
+              "proof_id": {
+                "type": "string"
+              },
+              "source_fingerprint": {
+                "type": "string"
+              },
+              "contract_fingerprint": {
+                "type": "string"
+              },
+              "address": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "value": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "model": {
+                "type": "string"
+              },
+              "entry_blocks": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                }
+              },
+              "supplied_grade": {
+                "enum": [
+                  "UNPROVED",
+                  "CONDITIONAL",
+                  "VERIFIED_CLAIM"
+                ]
+              },
+              "independently_verified": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "obligation",
+              "proof_id",
+              "source_fingerprint",
+              "contract_fingerprint",
+              "address",
+              "value",
+              "model",
+              "entry_blocks",
+              "supplied_grade",
+              "independently_verified"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "effects": {
+          "type": "object",
+          "properties": {
+            "state_may_read": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "uniqueItems": true
+            },
+            "state_may_write": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "uniqueItems": true
+            },
+            "memory_read": {
+              "type": "boolean"
+            },
+            "memory_write": {
+              "type": "boolean"
+            },
+            "mmio": {
+              "type": "boolean"
+            },
+            "fifo": {
+              "type": "boolean"
+            },
+            "fault": {
+              "type": "boolean"
+            },
+            "partial_effect": {
+              "type": "boolean"
+            },
+            "exit": {
+              "type": "boolean"
+            },
+            "callback": {
+              "type": "boolean"
+            },
+            "returning_mutation": {
+              "type": "boolean"
+            },
+            "time": {
+              "type": "boolean"
+            },
+            "reservation": {
+              "type": "boolean"
+            },
+            "coherence": {
+              "type": "boolean"
+            },
+            "mode": {
+              "type": "boolean"
+            },
+            "exception_resume": {
+              "type": "boolean"
+            },
+            "opaque": {
+              "type": "boolean"
+            },
+            "host_bindings": {
+              "type": "boolean"
+            },
+            "precommit_refusal": {
+              "type": "boolean"
+            },
+            "returning_exception": {
+              "type": "boolean"
+            },
+            "terminal_partial_effect": {
+              "type": "boolean"
+            },
+            "sound_overapproximation": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "state_may_read",
+            "state_may_write",
+            "memory_read",
+            "memory_write",
+            "mmio",
+            "fifo",
+            "fault",
+            "partial_effect",
+            "exit",
+            "callback",
+            "returning_mutation",
+            "time",
+            "reservation",
+            "coherence",
+            "mode",
+            "exception_resume",
+            "opaque",
+            "host_bindings",
+            "precommit_refusal",
+            "returning_exception",
+            "terminal_partial_effect",
+            "sound_overapproximation"
+          ],
+          "additionalProperties": false
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "block": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "target_block": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "target_address": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "kind": {
+                "type": "string"
+              },
+              "target_provenance": {
+                "type": "string"
+              },
+              "certainty": {
+                "enum": [
+                  "OPEN",
+                  "CONDITIONAL",
+                  "CLOSED"
+                ]
+              }
+            },
+            "required": [
+              "block",
+              "target_block",
+              "target_address",
+              "kind",
+              "target_provenance",
+              "certainty"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "address": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "reachable_from_declared_entries": {
+                "type": "boolean"
+              },
+              "returns_incoming_lr": {
+                "type": "boolean"
+              },
+              "transfer_provenance": {
+                "type": "string"
+              },
+              "live_in": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "uniqueItems": true
+              },
+              "live_out": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "index",
+              "address",
+              "reachable_from_declared_entries",
+              "returns_incoming_lr",
+              "transfer_provenance",
+              "live_in",
+              "live_out"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "native_abi_plan": {
+          "type": "object",
+          "properties": {
+            "eligible": {
+              "type": "boolean"
+            },
+            "exact_original_cuts_required": {
+              "type": "boolean"
+            },
+            "termination_proved": {
+              "type": "boolean"
+            },
+            "guest_stack_elision_allowed": {
+              "type": "boolean"
+            },
+            "semantic_live_in": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "uniqueItems": true
+            },
+            "may_live_out": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "uniqueItems": true
+            },
+            "preserve_or_materialize": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "uniqueItems": true
+            },
+            "materialize_at_every_original_cut": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 4294967295
+              },
+              "uniqueItems": true
+            },
+            "existing_advisory_analysis": {
+              "type": "object",
+              "properties": {
+                "abi_flags": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "abi_blockers": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 4294967295
+                },
+                "semantic_input_state": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967295
+                  },
+                  "uniqueItems": true
+                },
+                "may_def_state": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967295
+                  },
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "abi_flags",
+                "abi_blockers",
+                "semantic_input_state",
+                "may_def_state"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "eligible",
+            "exact_original_cuts_required",
+            "termination_proved",
+            "guest_stack_elision_allowed",
+            "semantic_live_in",
+            "may_live_out",
+            "preserve_or_materialize",
+            "materialize_at_every_original_cut",
+            "existing_advisory_analysis"
+          ],
+          "additionalProperties": false
+        },
+        "input_line": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "unknown_decode_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        }
+      },
+      "required": [
+        "schema",
+        "source_fingerprint",
+        "contract_fingerprint",
+        "implementation_id",
+        "model",
+        "scope",
+        "status",
+        "valid_ir",
+        "analysis_complete",
+        "mutates_ir",
+        "prunes_code",
+        "changes_timing",
+        "dimensions",
+        "reasons",
+        "evidence",
+        "effects",
+        "edges",
+        "blocks",
+        "native_abi_plan"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "dolrecomp.function-certification.v1"
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "status": {
+          "const": "OPEN"
+        },
+        "valid_ir": {
+          "const": false
+        },
+        "error": {
+          "enum": [
+            "INVALID_INPUT",
+            "BUILD_OR_VERIFY_FAILED"
+          ]
+        }
+      },
+      "required": [
+        "schema",
+        "line",
+        "status",
+        "valid_ir",
+        "error"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}
