@@ -230,7 +230,8 @@ std::string dagText(const Graph &g,const Dag &d) {
     dolanalysis::CheckedOutput s;for(auto v:d.order)s<<nodeText(*g.node(v))<<'\n';return s.str();
 }
 std::string query(const Graph &g,const Dag &d,const Candidate &c) {
-    dolanalysis::CheckedOutput s;s<<"(set-option :produce-proofs true)\n(set-logic QF_BV)\n";
+    // Proof production is configured before context creation, not in the query.
+    dolanalysis::CheckedOutput s;s<<"(set-logic QF_BV)\n";
     for(auto v:d.order) {
         auto &n=*g.node(v);unsigned w=width(n.type);
         if(d.leaves.count(v))s<<"(declare-fun "<<sym(v)<<" () (_ BitVec "<<w<<"))\n";
@@ -248,17 +249,30 @@ struct Solver {
     void *lib=nullptr; std::string error,version,library_hash;
     using P=void*;
     P(*mk_config)();void(*set_param)(P,const char*,const char*);void(*del_config)(P);
-    P(*mk_context)(P);void(*del_context)(P);const char*(*eval)(P,const char*);
+    P(*mk_context)(P);void(*del_context)(P);
+    P(*mk_solver_for_logic)(P,P);P(*mk_string_symbol)(P,const char*);void(*solver_inc_ref)(P,P);void(*solver_dec_ref)(P,P);
+    void(*solver_from_string)(P,P,const char*);int(*solver_check)(P,P);
+    P(*solver_get_proof)(P,P);const char*(*ast_to_string)(P,P);
+    P(*solver_get_model)(P,P);void(*model_inc_ref)(P,P);void(*model_dec_ref)(P,P);const char*(*model_to_string)(P,P);
+    P(*mk_params)(P);void(*params_inc_ref)(P,P);void(*params_dec_ref)(P,P);void(*params_set_uint)(P,P,P,unsigned);void(*solver_set_params)(P,P,P);
+    unsigned(*model_get_num_consts)(P,P);unsigned(*model_get_num_funcs)(P,P);
+    unsigned(*get_ast_id)(P,P);unsigned(*get_error_code)(P);void(*set_ast_print_mode)(P,unsigned);
     void(*get_version)(unsigned*,unsigned*,unsigned*,unsigned*);
     void(*set_error_handler)(P,void(*)(P,unsigned));
     template<class T>void get(T &fn,const char *name) {fn=reinterpret_cast<T>(dlsym(lib,name));if(!fn)error="SOLVER_API_UNAVAILABLE";}
     Solver() {
         lib=dlopen("libz3.so.4",RTLD_NOW|RTLD_LOCAL);library.reset(lib);if(!lib){error="SOLVER_UNAVAILABLE";return;}
         get(mk_config,"Z3_mk_config");get(set_param,"Z3_set_param_value");get(del_config,"Z3_del_config");
-        get(mk_context,"Z3_mk_context");get(del_context,"Z3_del_context");get(eval,"Z3_eval_smtlib2_string");get(get_version,"Z3_get_version");get(set_error_handler,"Z3_set_error_handler");
+        get(mk_context,"Z3_mk_context");get(del_context,"Z3_del_context");get(get_version,"Z3_get_version");get(set_error_handler,"Z3_set_error_handler");
+        get(mk_solver_for_logic,"Z3_mk_solver_for_logic");get(mk_string_symbol,"Z3_mk_string_symbol");get(solver_inc_ref,"Z3_solver_inc_ref");get(solver_dec_ref,"Z3_solver_dec_ref");
+        get(solver_from_string,"Z3_solver_from_string");get(solver_check,"Z3_solver_check");get(get_error_code,"Z3_get_error_code");
+        get(get_ast_id,"Z3_get_ast_id");get(solver_get_proof,"Z3_solver_get_proof");get(ast_to_string,"Z3_ast_to_string");get(set_ast_print_mode,"Z3_set_ast_print_mode");
+        get(mk_params,"Z3_mk_params");get(params_inc_ref,"Z3_params_inc_ref");get(params_dec_ref,"Z3_params_dec_ref");get(params_set_uint,"Z3_params_set_uint");get(solver_set_params,"Z3_solver_set_params");
+        get(model_get_num_consts,"Z3_model_get_num_consts");get(model_get_num_funcs,"Z3_model_get_num_funcs");
+        get(solver_get_model,"Z3_solver_get_model");get(model_inc_ref,"Z3_model_inc_ref");get(model_dec_ref,"Z3_model_dec_ref");get(model_to_string,"Z3_model_to_string");
         if(!error.empty())return;
         unsigned a,b,c,d;get_version(&a,&b,&c,&d);version=std::to_string(a)+"."+std::to_string(b)+"."+std::to_string(c)+"."+std::to_string(d);
-        Dl_info info{};if(dladdr(reinterpret_cast<void*>(eval),&info)&&info.dli_fname)library_hash=fileSha256(info.dli_fname);
+        Dl_info info{};if(dladdr(reinterpret_cast<void*>(get_version),&info)&&info.dli_fname)library_hash=fileSha256(info.dli_fname);
         if(!dolanalysis::isSha256(library_hash))error="SOLVER_IDENTITY_UNAVAILABLE";
     }
     Proof run(const std::string &q,unsigned timeout) {
@@ -270,19 +284,61 @@ struct Solver {
 #endif
         if(!dolanalysis::isSha256(p.query_sha256)||!dolanalysis::isSha256(p.implementation_sha256)){p.status="INVALID_PROOF_IDENTITY";return p;}
         if(!error.empty()){p.status=error;return p;}
-        const auto timeout_text=std::to_string(timeout);
         std::unique_ptr<void,void(*)(P)> cfg(mk_config(),del_config);
         if(!cfg){p.status="SOLVER_CONFIGURATION_FAILED";return p;}
-        set_param(cfg.get(),"proof","true");set_param(cfg.get(),"timeout",timeout_text.c_str());
+        set_param(cfg.get(),"proof","true");
         std::unique_ptr<void,void(*)(P)> ctx(mk_context(cfg.get()),del_context);
         if(!ctx){p.status="SOLVER_CONTEXT_FAILED";return p;}
         cfg.reset();set_error_handler(ctx.get(),[](P,unsigned){});
-        const char *r=eval(ctx.get(),q.c_str());p.solver_output=r?r:"";
-        if(p.solver_output=="unsat\n") {
-            p.status="UNSAT";
-            const char *proof=eval(ctx.get(),"(get-proof)");if(proof)p.solver_output+=proof;
-        } else if(p.solver_output=="sat\n") {
-            p.status="SAT";const char *model=eval(ctx.get(),"(get-model)");if(model)p.solver_output+=model;
+        // Low-level mode prints every shared proof node once.
+        set_ast_print_mode(ctx.get(),1); // Z3_PRINT_LOW_LEVEL
+        if(get_error_code(ctx.get())){p.status="SOLVER_CONFIGURATION_FAILED";return p;}
+        struct ReleaseObject {P context;void(*release)(P,P);void operator()(P object)const noexcept{release(context,object);}};
+        P logic=mk_string_symbol(ctx.get(),"QF_BV");
+        if(!logic||get_error_code(ctx.get())){p.status="SOLVER_CONFIGURATION_FAILED";return p;}
+        P raw_solver=mk_solver_for_logic(ctx.get(),logic);
+        if(!raw_solver||get_error_code(ctx.get())){p.status="SOLVER_CONFIGURATION_FAILED";return p;}
+        solver_inc_ref(ctx.get(),raw_solver);
+        std::unique_ptr<void,ReleaseObject> solver(raw_solver,{ctx.get(),solver_dec_ref});
+        P raw_params=mk_params(ctx.get());
+        if(!raw_params||get_error_code(ctx.get())){p.status="SOLVER_CONFIGURATION_FAILED";return p;}
+        params_inc_ref(ctx.get(),raw_params);
+        std::unique_ptr<void,ReleaseObject> params(raw_params,{ctx.get(),params_dec_ref});
+        P timeout_key=mk_string_symbol(ctx.get(),"timeout");
+        if(!timeout_key||get_error_code(ctx.get())){p.status="SOLVER_CONFIGURATION_FAILED";return p;}
+        params_set_uint(ctx.get(),params.get(),timeout_key,timeout);
+        if(get_error_code(ctx.get())){p.status="SOLVER_CONFIGURATION_FAILED";return p;}
+        solver_set_params(ctx.get(),solver.get(),params.get());
+        if(get_error_code(ctx.get())){p.status="SOLVER_CONFIGURATION_FAILED";return p;}
+        solver_from_string(ctx.get(),solver.get(),q.c_str());
+        if(get_error_code(ctx.get())){p.status="SOLVER_PARSE_FAILED";return p;}
+        const int result=solver_check(ctx.get(),solver.get());
+        if(get_error_code(ctx.get())){p.status="SOLVER_CHECK_FAILED";return p;}
+        if(result==-1) {
+            P proof=solver_get_proof(ctx.get(),solver.get());
+            if(!proof||get_error_code(ctx.get())){p.status="SOLVER_PROOF_FAILED";return p;}
+            const unsigned root=get_ast_id(ctx.get(),proof);
+            if(get_error_code(ctx.get())){p.status="SOLVER_PROOF_FAILED";return p;}
+            const char *text=ast_to_string(ctx.get(),proof);
+            if(get_error_code(ctx.get())||!dolanalysis::completeProofDag(text,root)){p.status="SOLVER_PROOF_FAILED";return p;}
+            p.solver_output=std::string("unsat\n")+text;
+            p.evidence_format="z3-shared-proof-dag.v1";p.proof_root_id=root;p.status="UNSAT";
+        } else if(result==1) {
+            P raw_model=solver_get_model(ctx.get(),solver.get());
+            if(!raw_model||get_error_code(ctx.get())){p.status="SOLVER_MODEL_FAILED";return p;}
+            model_inc_ref(ctx.get(),raw_model);
+            std::unique_ptr<void,ReleaseObject> model(raw_model,{ctx.get(),model_dec_ref});
+            const unsigned constants=model_get_num_consts(ctx.get(),model.get());
+            if(get_error_code(ctx.get())){p.status="SOLVER_MODEL_FAILED";return p;}
+            const unsigned functions=model_get_num_funcs(ctx.get(),model.get());
+            const uint64_t forms=uint64_t(constants)+functions;
+            if(get_error_code(ctx.get())||forms>SIZE_MAX){p.status="SOLVER_MODEL_FAILED";return p;}
+            set_ast_print_mode(ctx.get(),2); // Z3_PRINT_SMTLIB2_COMPLIANT
+            if(get_error_code(ctx.get())){p.status="SOLVER_MODEL_FAILED";return p;}
+            const char *text=model_to_string(ctx.get(),model.get());
+            if(get_error_code(ctx.get())||!dolanalysis::completeSExpressions(text,forms)){p.status="SOLVER_MODEL_FAILED";return p;}
+            p.solver_output=std::string("sat\n")+text;
+            p.evidence_format="smtlib2-model.v1";p.status="SAT";
         } else p.status="UNKNOWN_OR_ERROR";
         return p;
     }

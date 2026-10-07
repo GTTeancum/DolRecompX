@@ -25,6 +25,8 @@ struct SRemPow2 {
 struct Proof {
     std::string status, query, query_sha256, solver_output;
     std::string solver_version, solver_library_sha256, implementation_sha256;
+    std::string evidence_format;
+    uint32_t proof_root_id=0;
 };
 struct Candidate {
     unsigned block = 0, instruction = 0;

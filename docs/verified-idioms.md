@@ -83,6 +83,17 @@ source path at runtime. A missing build identity refuses proof. The current
 optional adapter loads Linux `libz3.so.4`; unavailable solver/identity, unknown,
 error and timeout cannot authorize a rewrite. Timeout must be 1..60000 ms;
 the default is 10000 ms. Node/candidate/source-size budgets are bounded.
+Proof mode is configured before context creation. The direct solver API checks
+parse/result errors and retrieves a complete proof or counterexample before
+reporting success; unavailable proof evidence refuses the candidate. Solver
+check timeout is set explicitly on each QF_BV solver. Shared-DAG proof output (`z3-shared-proof-dag.v1`) retains each node once;
+its complete final root and reference closure are checked. Counterexamples use
+`smtlib2-model.v1` with checked form structure and model-declaration counts.
+Both reject prefix truncation, with an 8 MiB post-retrieval text limit.
+This limit does not bound the solver's internal allocation or printing time.
+Completeness checks detect lost output; they do not implement a separate proof
+calculus. The solver remains trusted, and independent tests replay the saved
+canonical SMT query.
 
 The trusted checker callback is an explicit host trust boundary, not a
 cryptographic signature scheme. A production host must independently validate

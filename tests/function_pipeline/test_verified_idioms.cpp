@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "verified_idioms.h"
+#include "analysis/checked_serialization.h"
 #include "ir/dolir_builder.h"
 #include <filesystem>
 #include <fstream>
@@ -13,6 +14,10 @@
 #include <climits>
 #define CHECK(x) do { if(!(x)) throw std::runtime_error(std::string(__FILE__)+":"+std::to_string(__LINE__)+": " #x); } while(0)
 using namespace dolidiom;
+template<class F> static void writeFile(const std::filesystem::path &path,F writer){
+    std::ofstream output;output.exceptions(std::ios::badbit|std::ios::failbit);
+    output.open(path,std::ios::binary);writer(output);output.close();
+}
 static DolIRValue op(DolIRFunction *f,DolIRBlock *b,DolIROp o,DolIRType t,DolIRValue a,DolIRValue c=0){DolIRValue args[]={a,c};return dolir_append(f,b,o,t,args,c?2:1,0,0,b->guest_address,0);}
 struct Fixture {
     DolIRModule m{};DolIRFunction *f=nullptr;DolIRValue input=0,root=0,sign=0;
@@ -70,7 +75,7 @@ static RegionContract closed(const Fixture &x,const Candidate &c){
 }
 static std::vector<uint64_t> values(unsigned bits,unsigned k){std::vector<uint64_t>x={0,1,2,UINT64_MAX,UINT64_MAX-1,uint64_t(1)<<(bits-1),(uint64_t(1)<<(bits-1))-1,(uint64_t(1)<<k)-1,uint64_t(1)<<k,(uint64_t(1)<<k)+1,-(uint64_t(1)<<k),-(uint64_t(1)<<k)-1};uint64_t s=0x8bf43a39;for(int i=0;i<128;i++){s^=s<<13;s^=s>>7;s^=s<<17;x.push_back(s);}return x;}
 static std::string originalC(const DolIRFunction &f,DolIRValue root,const std::string &name){
-    std::ostringstream s;s<<"#include <stdint.h>\nstatic uint64_t m(unsigned w){return w==64?UINT64_MAX:(UINT64_C(1)<<w)-1;}\nstatic uint64_t asr(uint64_t x,unsigned k,unsigned w){return !k?x:(x>>k)|((x>>(w-1))?(m(w)^m(w-k)):0);}\nstatic uint64_t rot(uint64_t x,unsigned k,unsigned w){k%=w;return k?((x<<k)|(x>>(w-k)))&m(w):x;}\nuint64_t "<<name<<"(uint64_t input){\n";
+    dolanalysis::CheckedOutput s;s<<"#include <stdint.h>\nstatic uint64_t m(unsigned w){return w==64?UINT64_MAX:(UINT64_C(1)<<w)-1;}\nstatic uint64_t asr(uint64_t x,unsigned k,unsigned w){return !k?x:(x>>k)|((x>>(w-1))?(m(w)^m(w-k)):0);}\nstatic uint64_t rot(uint64_t x,unsigned k,unsigned w){k%=w;return k?((x<<k)|(x>>(w-k)))&m(w):x;}\nuint64_t "<<name<<"(uint64_t input){\n";
     for(unsigned b=0;b<f.block_count;b++)for(unsigned j=0;j<f.blocks[b].instruction_count;j++){
       auto &n=f.blocks[b].instructions[j];if(!n.result)continue;auto w=width(n.type);auto a="v"+std::to_string(n.operands[0]),c="v"+std::to_string(n.operands[1]);std::string e;
       switch(n.op){case DOLIR_OP_STATE_READ:e="input";break;case DOLIR_OP_CONSTANT:e="UINT64_C("+std::to_string(n.immediate)+")";break;
@@ -81,7 +86,7 @@ static std::string originalC(const DolIRFunction &f,DolIRValue root,const std::s
     s<<"return v"<<root<<";\n}\n";return s.str();
 }
 static std::string originalLLVM(const DolIRFunction &f,DolIRValue root,const std::string &name){
-    std::ostringstream s;std::set<unsigned> rotations;
+    dolanalysis::CheckedOutput s;std::set<unsigned> rotations;
     s<<"define i64 @"<<name<<"(i64 %input) {\n";
     for(unsigned b=0;b<f.block_count;b++)for(unsigned j=0;j<f.blocks[b].instruction_count;j++){
       auto &n=f.blocks[b].instructions[j];if(!n.result)continue;auto w=width(n.type);auto t="i"+std::to_string(w),a="%v"+std::to_string(n.operands[0]),c="%v"+std::to_string(n.operands[1]);std::string e;
@@ -97,13 +102,13 @@ static std::string originalLLVM(const DolIRFunction &f,DolIRValue root,const std
 }
 static std::string effectBytes(const DolIRFunction &f){std::string s;for(unsigned b=0;b<f.block_count;b++)for(unsigned j=0;j<f.blocks[b].instruction_count;j++){auto &n=f.blocks[b].instructions[j];if(n.effects)s.append(reinterpret_cast<const char*>(&n),sizeof n);}return s;}
 static void save(const DolIRFunction &f,const Candidate &c,const std::filesystem::path &dir,const std::string &name){
-    std::ofstream(dir/(name+".smt2"))<<c.proof.query;
-    std::ofstream(dir/(name+".proof"))<<c.proof.solver_output;
-    std::ofstream(dir/(name+".certificate"))<<"schema="<<schema<<"\nsource="<<c.source_fingerprint<<"\ncuts="<<c.source_cut_fingerprint<<"\ndag="<<c.dag_fingerprint<<"\nquery="<<c.proof.query_sha256<<"\nsolver="<<c.proof.solver_version<<"\nsolver_library="<<c.proof.solver_library_sha256<<"\nimplementation="<<c.proof.implementation_sha256<<"\nresult="<<c.proof.status<<'\n';
-    std::ofstream(dir/(name+".c"))<<emitRecoveredC(c.expression,name+"_c");
-    std::ofstream(dir/(name+".ll"))<<emitRecoveredLLVM(c.expression,name+"_llvm");
-    std::ofstream(dir/(name+"_original.c"))<<originalC(f,c.root,name+"_original_c");
-    std::ofstream(dir/(name+"_original.ll"))<<originalLLVM(f,c.root,name+"_original_llvm");
+    writeFile(dir/(name+".smt2"),[&](std::ostream &output){output<<c.proof.query;});
+    writeFile(dir/(name+".proof"),[&](std::ostream &output){output<<c.proof.solver_output;});
+    writeFile(dir/(name+".certificate"),[&](std::ostream &output){output<<"schema="<<schema<<"\nsource="<<c.source_fingerprint<<"\ncuts="<<c.source_cut_fingerprint<<"\ndag="<<c.dag_fingerprint<<"\nquery="<<c.proof.query_sha256<<"\nsolver="<<c.proof.solver_version<<"\nsolver_library="<<c.proof.solver_library_sha256<<"\nimplementation="<<c.proof.implementation_sha256<<"\nproof_root_id="<<c.proof.proof_root_id<<"\nevidence_format="<<c.proof.evidence_format<<"\nresult="<<c.proof.status<<'\n';});
+    writeFile(dir/(name+".c"),[&](std::ostream &output){output<<emitRecoveredC(c.expression,name+"_c");});
+    writeFile(dir/(name+".ll"),[&](std::ostream &output){output<<emitRecoveredLLVM(c.expression,name+"_llvm");});
+    writeFile(dir/(name+"_original.c"),[&](std::ostream &output){output<<originalC(f,c.root,name+"_original_c");});
+    writeFile(dir/(name+"_original.ll"),[&](std::ostream &output){output<<originalLLVM(f,c.root,name+"_original_llvm");});
 }
 static unsigned builderTests(const std::filesystem::path &dir,const Options &o){
     auto x=[](unsigned r,unsigned a,unsigned b,unsigned xo){return (31u<<26)|(r<<21)|(a<<16)|(b<<11)|(xo<<1);};
@@ -118,7 +123,7 @@ static unsigned builderTests(const std::filesystem::path &dir,const Options &o){
         CHECK(found);CHECK(found->conditional_on_state_forwarding);CHECK(found->source_blocks.size()>1);CHECK(sourceFingerprint(f)==before);
         CHECK(!apply(f,*found,{},o).changed);auto forged=*found;forged.source_blocks={forged.block};forged.conditional_on_state_forwarding=false;CHECK(verify(f,forged).status=="STALE_OR_INVALID_CANDIDATE");
         forged=*found;forged.reaching_state_forwardings.clear();CHECK(verify(f,forged).status=="STALE_OR_INVALID_CANDIDATE");
-        if(k==5){std::ofstream(dir/"builder.smt2")<<found->proof.query;std::ofstream(dir/"builder.proof")<<found->proof.solver_output;std::ofstream listing(dir/"builder.words");for(unsigned i=0;i<raw.size();i++)listing<<std::hex<<(0x4000+4*i)<<' '<<raw[i]<<'\n';}
+        if(k==5){writeFile(dir/"builder.smt2",[&](std::ostream &output){output<<found->proof.query;});writeFile(dir/"builder.proof",[&](std::ostream &output){output<<found->proof.solver_output;});std::ofstream listing;listing.exceptions(std::ios::badbit|std::ios::failbit);listing.open(dir/"builder.words");for(unsigned i=0;i<raw.size();i++)listing<<std::hex<<(0x4000+4*i)<<' '<<raw[i]<<'\n';listing.close();}
         dolir_module_free(&m);count++;
         // A mutated bias must not obtain the intended remainder certificate.
         raw.insert(raw.begin()+2,(26u<<26)|(4u<<21)|(4u<<16)|1u);words.clear();for(unsigned i=0;i<raw.size();i++)words.push_back(ppc_decode(raw[i],0x4000+4*i));
@@ -140,9 +145,9 @@ int main(int argc,char **argv){try{
         if(shape==2 && (k<4||k==bits-2))save(*x.f,*p,dir,"rem"+std::to_string(bits)+"_"+std::to_string(k)+"_"+std::to_string(out));
         auto cuts=sourceCutFingerprint(*x.f);auto effects=effectBytes(*x.f);auto applied=apply(*x.f,*p,closed(x,*p),enabled);CHECK(applied.changed);
         auto key="w"+std::to_string(bits)+"-k"+std::to_string(k)+"-shape"+std::to_string(shape)+"-out"+std::to_string(out);
-        std::ofstream(dir/"all-proofs"/(key+".smt2"))<<applied.replay_proof.query;
-        std::ofstream(dir/"all-proofs"/(key+".solver"))<<applied.replay_proof.solver_output;
-        std::ofstream(dir/"all-proofs"/(key+".certificate"))<<"schema="<<schema<<"\nsource="<<applied.before_fingerprint<<"\nafter="<<applied.after_fingerprint<<"\ncontract="<<applied.function_contract_fingerprint<<"\ncertification_implementation="<<applied.certification_implementation_id<<"\nquery="<<applied.replay_proof.query_sha256<<"\nsolver="<<applied.replay_proof.solver_version<<"\nsolver_library="<<applied.replay_proof.solver_library_sha256<<"\nimplementation="<<applied.replay_proof.implementation_sha256<<"\nresult="<<applied.replay_proof.status<<'\n';
+        writeFile(dir/"all-proofs"/(key+".smt2"),[&](std::ostream &output){output<<applied.replay_proof.query;});
+        writeFile(dir/"all-proofs"/(key+".solver"),[&](std::ostream &output){output<<applied.replay_proof.solver_output;});
+        writeFile(dir/"all-proofs"/(key+".certificate"),[&](std::ostream &output){output<<"schema="<<schema<<"\nsource="<<applied.before_fingerprint<<"\nafter="<<applied.after_fingerprint<<"\ncontract="<<applied.function_contract_fingerprint<<"\ncertification_implementation="<<applied.certification_implementation_id<<"\nquery="<<applied.replay_proof.query_sha256<<"\nsolver="<<applied.replay_proof.solver_version<<"\nsolver_library="<<applied.replay_proof.solver_library_sha256<<"\nimplementation="<<applied.replay_proof.implementation_sha256<<"\nproof_root_id="<<applied.replay_proof.proof_root_id<<"\nevidence_format="<<applied.replay_proof.evidence_format<<"\nresult="<<applied.replay_proof.status<<'\n';});
         CHECK(sourceCutFingerprint(*x.f)==cuts);CHECK(effectBytes(*x.f)==effects);
         CHECK(dolir_verify(&x.m,stderr));for(unsigned i=0;i<seq.size();i++)CHECK(evaluate(*x.f,x.root,seq[i])==expected[i]);
         CHECK(!apply(*x.f,*p,closed(x,*p),enabled).changed);positives++;
