@@ -433,6 +433,22 @@ static bool lower_integer(Builder* b) {
             (i->op == PPC_OP_CMPLI) ? c32(b, i->uimm) : gpr(b, i->rB);
         set_cr_field(b, i->crfD, a, c, i->op == PPC_OP_CMPI || i->op == PPC_OP_CMP);
         return true;
+    case PPC_OP_ADDO: {
+        /* Signed widening keeps the exact sum; ADDO does not alter XER.CA. */
+        a = sext_value(b, DOLIR_TYPE_I64, gpr(b, i->rA));
+        c = sext_value(b, DOLIR_TYPE_I64, gpr(b, i->rB));
+        DolIRValue wide = binary(b, DOLIR_OP_ADD, DOLIR_TYPE_I64, a, c);
+        result = trunc_value(b, DOLIR_TYPE_I32, wide);
+        DolIRValue overflow = binary(b, DOLIR_OP_ICMP_NE, DOLIR_TYPE_I1,
+                                     sext_value(b, DOLIR_TYPE_I64, result), wide);
+        write_slot(b, DOLIR_STATE_XER_OV, overflow);
+        write_slot(b, DOLIR_STATE_XER_SO,
+                   binary(b, DOLIR_OP_OR, DOLIR_TYPE_I1,
+                          read_slot(b, DOLIR_STATE_XER_SO), overflow));
+        set_gpr(b, i->rD, result);
+        record_if_needed(b, result);
+        return true;
+    }
     case PPC_OP_ADD: case PPC_OP_ADDC: case PPC_OP_ADDE:
     case PPC_OP_ADDCO: case PPC_OP_ADDEO:
         if (i->oe)

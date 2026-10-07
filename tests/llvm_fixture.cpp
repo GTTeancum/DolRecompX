@@ -2,6 +2,7 @@
 #include "backend/llvm/native_abi.h"
 #include "cpu/cpu.h"
 #include "ir/dolir_builder.h"
+#include "addo_cases.h"
 
 #include <cstdio>
 #include <cstring>
@@ -56,6 +57,24 @@ static bool add_chunk(DolIRModule *module, const u32 *words, u32 count,
   const bool result = dolir_build_chunk(module, instructions, count, address);
   delete[] instructions;
   return result;
+}
+
+static bool add_addo_chunks(DolIRModule *module) {
+  for (const DolirAddoCase &test : dolir_addo_cases) {
+    u32 words[5];
+    for (u32 n = 0; n < test.count; n++) {
+      const DolirAddoOperands &op = test.ops[n];
+      words[n] = xform(266, op.d, op.a, op.b) | (1u << 10) | op.rc;
+    }
+    words[test.count] = mfspr(29, 1);
+    words[test.count + 1u] = xform(19, 30, 0, 0);
+    words[test.count + 2u] = 0x4E800020u;
+    if (!add_chunk(module, words, test.count + 3u, test.pc)) return false;
+    const DolIRFunction &function = module->functions[module->function_count - 1u];
+    for (u32 n = 0; n < test.count; n++)
+      if (function.blocks[n].terminator.kind == DOLIR_TERM_FALLBACK) return false;
+  }
+  return true;
 }
 
 static bool force_first_block_fallback(DolIRModule *module, u32 cycleCost) {
@@ -804,7 +823,17 @@ int main(int argc, char **argv) {
   CHECK(add_chunk(&module, nested_fallback_callee_words, 2, 0x80005100u));
   CHECK(force_first_block_fallback(&module, 1u));
 
+  CHECK(add_addo_chunks(&module));
   CHECK(dolir_verify(&module, stderr));
+  DolIRModule addoOnly;
+  dolir_module_init(&addoOnly);
+  CHECK(add_addo_chunks(&addoOnly) && dolir_verify(&addoOnly, stderr));
+  DolLLVMOptions addoOptions{};
+  addoOptions.optimization_level = 0;
+  addoOptions.verify = 1;
+  const std::string addoO0 = std::string(argv[1]) + ".addo-o0";
+  CHECK(dolllvm_emit_object(&addoOnly, addoO0.c_str(), &addoOptions, stderr));
+  dolir_module_free(&addoOnly);
   DolLLVMOptions options{};
   options.optimization_level = 2;
   options.verify = 1;

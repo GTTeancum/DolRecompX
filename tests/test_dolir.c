@@ -1,5 +1,6 @@
 #include "ir/dolir_builder.h"
 #include "cpu/cpu.h"
+#include "addo_cases.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -309,6 +310,47 @@ static bool test_segment_registers(void) {
     return true;
 }
 
+static bool test_addo_lowering(void) {
+    for (u32 form = 0; form < sizeof(dolir_addo_cases) / sizeof(dolir_addo_cases[0]); form++) {
+        const DolirAddoCase* test = &dolir_addo_cases[form];
+        PPCInst insts[5];
+        for (u32 n = 0; n < test->count; n++) {
+            const DolirAddoOperands* op = &test->ops[n];
+            const u32 raw = (31u << 26) | ((u32)op->d << 21) | ((u32)op->a << 16) |
+                            ((u32)op->b << 11) | (1u << 10) | (266u << 1) | op->rc;
+            insts[n] = decode(raw, test->pc + 4u * n);
+            CHECK(insts[n].op == PPC_OP_ADDO && insts[n].oe && insts[n].rc == op->rc);
+            CHECK(insts[n].rD == op->d && insts[n].rA == op->a && insts[n].rB == op->b);
+        }
+        insts[test->count] = decode(0x7FA102A6u, test->pc + 4u * test->count);
+        insts[test->count + 1u] = decode(0x7FC00026u, test->pc + 4u * (test->count + 1u));
+        insts[test->count + 2u] = decode(0x4E800020u, test->pc + 4u * (test->count + 2u));
+        DolIRModule module;
+        dolir_module_init(&module);
+        CHECK(dolir_build_chunk(&module, insts, test->count + 3u, test->pc));
+        CHECK(dolir_verify(&module, stderr));
+        for (u32 n = 0; n < test->count; n++) {
+            const DolIRBlock* block = &module.functions[0].blocks[n];
+            CHECK(block->terminator.kind == DOLIR_TERM_FALLTHROUGH);
+            bool ov = false, so = false, result = false, cr0 = false;
+            for (u32 j = 0; j < block->instruction_count; j++) {
+                const DolIRInstruction* instruction = &block->instructions[j];
+                CHECK(instruction->op != DOLIR_OP_HELPER_CALL);
+                CHECK(!dolir_state_mask_test(instruction->state_defs, DOLIR_STATE_XER_CA));
+                CHECK(!dolir_state_mask_test(instruction->state_defs, DOLIR_STATE_XER));
+                if (instruction->op != DOLIR_OP_STATE_WRITE) continue;
+                ov |= instruction->aux == DOLIR_STATE_XER_OV;
+                so |= instruction->aux == DOLIR_STATE_XER_SO;
+                result |= instruction->aux == DOLIR_STATE_GPR0 + test->ops[n].d;
+                cr0 |= instruction->aux == DOLIR_STATE_CR0;
+            }
+            CHECK(ov && so && result && cr0 == (test->ops[n].rc != 0));
+        }
+        dolir_module_free(&module);
+    }
+    return true;
+}
+
 static bool test_cache_timing(void) {
     PPCInst dcbst = decode(0x7C11906Cu, 0x80005000u);
     PPCInst icbi = decode(0x7C1BE7ACu, 0x80005004u);
@@ -322,7 +364,7 @@ int main(void) {
         !test_static_memory_provenance() ||
         !test_mem2_and_bounded_memory_provenance() ||
         !test_float_record_and_paired_compare() || !test_segment_registers() ||
-        !test_cache_timing())
+        !test_cache_timing() || !test_addo_lowering())
         return 1;
     puts("dolir tests passed");
     return 0;

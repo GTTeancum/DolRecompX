@@ -519,6 +519,7 @@ if(DOLRECOMP_ENABLE_LLVM)
     add_custom_command(
         OUTPUT ${DOLRECOMP_TEST_OBJECT} ${DOLRECOMP_TEST_IR}
         BYPRODUCTS
+            ${DOLRECOMP_TEST_OBJECT}.addo-o0
             ${DOLRECOMP_TEST_OBJECT}.v2
             ${DOLRECOMP_TEST_OBJECT}.v2.copy
             ${DOLRECOMP_TEST_OBJECT}.v2.bc
@@ -561,6 +562,7 @@ if(DOLRECOMP_ENABLE_LLVM)
     set_source_files_properties(${DOLRECOMP_TEST_OBJECT}
         PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
     set_source_files_properties(
+        ${DOLRECOMP_TEST_OBJECT}.addo-o0
         ${DOLRECOMP_TEST_OBJECT}.native
         ${DOLRECOMP_ABI_CALLER_OBJECT}
         ${DOLRECOMP_ABI_CALLEE_OBJECT}
@@ -592,6 +594,13 @@ if(DOLRECOMP_ENABLE_LLVM)
         tests/llvm_semantics_test.c ${DOLRECOMP_TEST_OBJECT})
     target_link_libraries(llvm_semantics_test PRIVATE dr_cpu)
     add_test(NAME llvm_semantics COMMAND llvm_semantics_test)
+    add_executable(llvm_addo_test tests/llvm_addo_test.c ${DOLRECOMP_TEST_OBJECT})
+    add_executable(llvm_addo_o0_test tests/llvm_addo_test.c ${DOLRECOMP_TEST_OBJECT}.addo-o0)
+    foreach(_addo_target llvm_addo_test llvm_addo_o0_test)
+        add_dependencies(${_addo_target} llvm_fixture_outputs)
+        target_link_libraries(${_addo_target} PRIVATE dr_cpu)
+        add_test(NAME ${_addo_target} COMMAND ${_addo_target})
+    endforeach()
     add_executable(native_interception_test
         tests/native_interception_test.c ${DOLRECOMP_TEST_OBJECT})
     target_link_libraries(native_interception_test PRIVATE dr_cpu)
@@ -621,6 +630,11 @@ if(DOLRECOMP_ENABLE_LLVM)
         tests/paired_single_test.c ${DOLRECOMP_TEST_OBJECT})
     target_link_libraries(paired_single_test PRIVATE dr_cpu)
     add_test(NAME paired_single COMMAND paired_single_test)
+    # Shared fixture generation must finish before any consumer links its outputs.
+    foreach(_fixture_consumer llvm_smoke_test llvm_semantics_test
+                              native_interception_test paired_single_test)
+        add_dependencies(${_fixture_consumer} llvm_fixture_outputs)
+    endforeach()
     add_executable(llvm_backend_bench
         benchmarks/llvm_backend_bench.c
         ${DOLRECOMP_TEST_OBJECT}
